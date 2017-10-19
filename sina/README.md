@@ -28,17 +28,17 @@ https://m.weibo.cn/api/comments/show?id=4160547165300149&page=1
 
 7：结论
 
-snownlp：
+【snownlp】：
 情感值在接近0、1两端以及0.5左右位置频率较高(0.5可能为无法解析出情感值)
 ![Image text](https://github.com/braid123/crossin/blob/master/sina/sina/snownlp.png)
 
 加入人为数据训练snownlp后，图片任无较大变化
 ![Image text](https://github.com/braid123/crossin/blob/master/sina/sina/snownlp_addmydata.png)
 
-腾讯文智：
+【腾讯文智】：
 
 ![Image text](https://github.com/braid123/crossin/blob/master/sina/sina/%E8%85%BE%E8%AE%AF%E6%96%87%E6%99%BA.png)
 
-腾讯文智抽取1K并过滤掉0.5即无法解析的值：
+腾讯文智抽取1K并过滤掉0.5即无法解析的值：发现负面情绪较多
 
 ![Image text](https://github.com/braid123/crossin/blob/master/sina/sina/%E8%85%BE%E8%AE%AF%E6%96%87%E6%99%BA%E9%9A%8F%E6%9C%BA%E6%8A%BD%E5%8F%961K%E5%B9%B6%E8%BF%87%E6%BB%A4.png)

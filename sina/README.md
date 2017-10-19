@@ -24,7 +24,7 @@ https://m.weibo.cn/api/comments/show?id=4160547165300149&page=1
 
 5：分析并保存数据，用正则或者BS4去匹配（get_comment_content）
 
-6：评论情感解析【1：snownlp   2:腾讯文智】
+6：评论情感解析【1：snownlp   2：腾讯文智】
 
 7：结论
 

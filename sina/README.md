@@ -22,10 +22,113 @@ https://m.weibo.cn/api/comments/show?id=4160547165300149&page=1
 
 4：请求网页Request URL，对返回的json数据进行解析（start_requests）
 
+```    
+def start_requests(self):
+        single_weibo_id = '4160547165300149'
+        post_comment_url = 'https://m.weibo.cn/api/comments/show?id=%s&page=4531' % single_weibo_id
+        yield Request(url=post_comment_url, callback=self.get_comment_content) 
+```
 5：分析并保存数据，用正则或者BS4去匹配（get_comment_content）
+```
+# 获取评论内容
+def get_comment_content(self, response):
+    content = json.loads(response.body)
+    if content.get('ok') == 1:
+        for data in content.get('data'):
+            post_id = re.findall('(\d+)', response.url)[0]
+            commentid = data.get('id')
+            # 将回复后的评论截取出
+            text = re.sub('<.*?>', '', data.get('text'))
+            text_2 = re.sub(r'.*?@.*?:', '', text)
+            reply_text = re.sub('.*?@.*?:', '', re.sub('<.*?>', '', data.get('reply_text', '')))
+            like_counts = data.get('like_counts')
+            item = CommentItem()
+            # 数据保存
+            item['id'] = commentid
+            item['comment'] = text_2
+            item['refer'] = reply_text
+            item['post_id'] = post_id
+            item['like_counts'] = like_counts
+            yield item
+```
+设立循环条件，取出各页评论：
+```
+max_page = content.get('max')
+page_num_pattern = r'(\d+)'
+page_num = re.findall(page_num_pattern, response.url)[1]
 
+if int(max_page) > 1 and int(max_page) > int(page_num):
+    post_id_pattern = r'.*?id=(\d+)&page=.*?'
+    post_id = re.findall(post_id_pattern, response.url)[0]
+    url = 'https://m.weibo.cn/api/comments/show?id=%s&page=%s' % (post_id, str(int(page_num) + 3))
+    time.sleep(random.randint(0, 10))
+    yield Request(url=url, callback=self.get_comment_content)
+
+```
 6：评论情感解析【1：snownlp   2：腾讯文智】
 
+xmltotxt.py:将目录下的 xml 文件中的评论提取并保存于 txt 中，用作训练样本
+```          
+# 打开xml文档
+dom = xml.dom.minidom.parse(file)
+# 得到文档元素对象
+sentences = dom.getElementsByTagName('sentence')
+```
+trainmynlp.py: 将训练好的文件存储为 seg.marshal
+```
+from snownlp import sentiment
+sentiment.train('neg.txt', 'pos.txt')
+sentiment.save('sentiment.marshal')
+```
+parsecomment.py:
+提取数据库中的评论，并调用 snownlp 分析出每条评论情感值，最后利用 matplotlib 生成
+图像
+```
+for li in textlist:
+    s = SnowNLP(li)
+    sentimentslist.append(s.sentiments)
+fig1 = plt.figure("test")
+plt.hist(sentimentslist, bins=np.arange(0, 1, 0.02))
+plt.show()
+```
+nlptencentparse.py:利用腾讯文智提供的 API，分析出情感值
+
+1）对已经存入数据库的数据进行提取
+```
+conn = pymysql.connect(host='localhost',user='root',password='root',charset="utf8")
+with conn:
+    cur = conn.cursor()
+    # 随机选取表中数据
+    cur.execute("SELECT * FROM sina.sinacomment order By Rand()")
+    rows = cur.fetchall()
+```
+2）参考腾讯文智的 API 文档和说明设置参数
+```
+module = 'wenzhi'
+action = 'TextSentiment'
+config = {
+    'Region': 'ap-guangzhou',
+    'secretId': '腾讯云API申请的标识身份的 SecretId',
+    'secretKey': '一个 SecretId 对应唯一的 SecretKey',
+    'method': 'GET',
+    'SignatureMethod': 'HmacSHA1'
+}
+```
+3）调用接口
+```
+# 调用接口，发起请求
+s = service.call(action, action_params)
+dejson = json.loads(s)
+```
+4）生成图像
+```
+# 创建名为sentiment的figure对象
+fig1 = plt.figure("sentiment")
+# 生成Histograms直方图
+plt.hist(sentimentslist, bins=np.arange(0, 1, 0.02))
+# 展示图像
+plt.show()
+```
 7：结论
 
 【snownlp】：

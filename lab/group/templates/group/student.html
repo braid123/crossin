@@ -35,31 +35,31 @@
 	</thead>
 	<tbody id='useringroup'>
 		{% for lab_user in users %}
-		{% if lab_user.group.id == group.id %}
-			<tr id='user{{ lab_user.id }}'>
-				<td>
-					<input type="checkbox" name="studentgroup" value="1" onclick="chose(this)">
-					<a href='{% url "group:studentgroup" %}?group={{ group.id}}'>
-				    {{ lab_user.group.id }}
-					</a>
-				</td>
-				<td>
-					{{ lab_user.group.group_name }}
-				</td>
-				<td class='unhid hidSwith'>
-					<a href='#zz' class='username' style='color:blue'>{{ lab_user }}</a>
-				</td>
-				<td class='unhid hidSwith'>
-					{{ lab_user.wechat }}
-				</td>
-				<td class='unhid hidSwith'>
-					{{ lab_user.nickname }}
-				</td>
-				<td>
-					{{ lab_user.group.group_note }}
-				</td>				
-			</tr>
-		{% endif %}
+		<tr id='user{{ lab_user.id }}'>
+			{% if lab_user.group.id == group.id %}
+			<td>
+				<input type="checkbox" name="studentgroup" value="1" onclick="chose(this)">
+				<a href='{% url "group:studentgroup" %}?group={{lab_user.group.id}}'>
+				{{ lab_user.group.id }}
+				</a>
+			</td>
+			<td>
+				{{ lab_user.group.group_name }}
+			</td>
+			<td class='unhid hidSwith'>
+				<a href='#zz' class='username' style='color:blue'>{{ lab_user }}</a>
+			</td>
+			<td class='unhid hidSwith'>
+				{{ lab_user.wechat }}
+			</td>
+			<td class='unhid hidSwith'>
+				{{ lab_user.nickname }}
+			</td>
+			<td>
+				{{ lab_user.group.group_note }}
+			</td>								
+			{% endif %}
+		</tr>
 		{% endfor %}
 	</tbody>
 </table>
@@ -150,11 +150,10 @@ function AddGroupName(){
 		var f = e.target,
 			formData = new FormData(f),
 			xhr = new XMLHttpRequest(),
-            elem_li = document.createElement('button'); // 生成一个button元素
-		elem_li.setAttribute("class","btn btn-info btn-block btn-lg");//设置元素属性
-		elem_li.setAttribute("id","grouplist");//设置元素属性
+            elem_li = document.createElement('li'); // 生成一个button元素
+		elem_li.setAttribute("class","nav active ");//设置元素属性
+		elem_li.setAttribute("role","presentation");//设置元素属性
 		document.querySelector('#row-left > ul').append(elem_li); // 添加到UL中去
-		// para = document.getElementById('grouplist').insertRow(0);
 		$('#GroupAddModal').modal('hide');
 		xhr.open("POST", f.action, true);
 		xhr.onreadystatechange=function(){
@@ -173,10 +172,7 @@ function AddGroupName(){
 
 function ChangeUserGroup(){
 	console.log('Enter the ChangeUserGroup');
-};
-
-function ShowOneGroupUser(){
-    console.log('Enter the ShowOneGroupUser');
+	
 };
 </script>
 {% endblock %}

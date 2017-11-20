@@ -22,10 +22,12 @@ def student_group(request):
 def _student_group_get(request):
     groups = models.StudentGroup.objects.all()
     users = labcrm.models.LabUser.objects.filter(is_del=False).order_by('-user__date_joined')
-    # groupid = request.GET.get('groudid')
+    group_id = request.GET.get('group', 1)
+    group = models.StudentGroup.objects.get(id=group_id)
     return render(request, 'group/student.html', {
         'users': users,
         'groups': groups,
+        'group': group,
     })
 
 

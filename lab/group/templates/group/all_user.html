@@ -1,0 +1,7 @@
+{% for lab_user in users %}
+{% if lab_user.group.id == group.id %}
+	<tr id='user{{ lab_user.id }}'>
+		{% include 'group/user_list_base.html' %}
+	</tr>
+{% endif %}
+{% endfor %}

@@ -1,0 +1,39 @@
+<table class="table table-hover table-striped table-bordered">
+	{% if is_strict == 'True' %}
+	<caption>严格入群规则</caption>
+	{% else %}
+	<caption>宽松入群规则</caption>
+	{% endif %}
+	<thead class='thead-inverse'>
+		<tr>
+			<th class='col-md-4 input-lg'>群名</th>
+			<th class='col-md-6 input-lg'>关键字集</th>
+			<th class='col-md-2 input-lg text-center'>匹配次序</th>
+		</tr>
+	</thead>
+	<tbody id='formRule'>
+		{% for room in rooms %}
+		<tr>
+			<td class='input-lg'>
+			{% if is_strict == 'True' %}
+				{{ room|cut:"#" }}
+			{% else %}
+				{{ room }}
+			{% endif %}
+			</td>
+			<td class='input-lg'>
+			{% for rule in room.rules.all %}
+				{{ rule.keyword }} 
+			{% endfor %}
+			</td>
+			<td class='input-lg text-center'>
+			{% if is_strict == 'True' %}
+				{{ room.order|add:-100 }}
+			{% else %}
+				{{ room.order }}
+			{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

@@ -1,0 +1,338 @@
+{% extends 'base2.html' %}
+{% block title %}用户列表{% endblock %}
+{% block nav_bar %}
+	{% include 'labcrm/tools/nav_bar.html' with tag_list="active" %}
+{% endblock %}
+{% block row-left %}
+<button id='btnUserAdd' class='btn btn-info btn-block btn-lg' data-toggle="modal" data-target="#userAddModal" onclick='userAdd()'>添加成员</button>
+<button id='btnUserDel' class='btn btn-warning btn-block btn-lg' onclick='userDel()'>删除成员</button>
+<button id='btnModify' class='btn btn-primary btn-block btn-lg' onclick='rename()'>信息修改</button>
+<button id='btnModOver' class='btn btn-success btn-block btn-lg hidden' onclick='renameOver()'>修改完毕</button>
+<button id='btnDelSure' class='btn btn-danger btn-block btn-lg hidden' form='formUserDel' type='submit' onclick='delSure()'>确认删除</button>
+{% endblock %}
+{% block row-right %}
+<table class="table table-hover table-striped table-bordered">
+	<caption>
+		<h3 class='text-center'>
+			<span>成员列表</span>
+			<span><input type='submit' class='btn btn-sm btn-primary pull-right' onclick='dumpdata()' form='formDowload' value='导出'></span>
+		</h3>
+	</caption>
+	<thead class='thead-inverse'>
+		<tr>
+			<th>本站名</th><!-- 昵称为本站 user.username -->
+			<th>用户名 | 学习记录</th><!-- 用户名为学习站 user.username 本站 lab_user.nickname -->
+			<th>微信</th>
+			<th>助教</th>
+			<th>问卷</th>
+			<th>入学日期</th>
+			<th>沟通记录</th>
+			<th class='hidden tbHid'>删除</th>
+		</tr>
+	</thead>
+	<tbody id='userList'>
+	{% include 'labcrm/ajax/user_del.html' %}
+	</tbody>
+</table>
+{% endblock %}
+{% block modal %}
+<form class='hidden' id='formUserDel' action='{% url "crm:ajax:del" %}' method='POST'>{% csrf_token %}</form>
+<form class='hidden' id='formDowload' action='http://127.0.0.1:8000/admin/labcrm/labuser/export/' method='POST'>
+	{% csrf_token %}
+	<input class='hidden' name='file_format' value='0'>
+</form>
+<div class="modal fade" id='userAddModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">添加成员：</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id='formUserAdd' action='' method='POST'>
+					{% csrf_token %}
+					<input class='hidden' name='update' id='update' disabled>
+					<div class="form-group">
+						<label class='col-lg-2 control-label' for='addNickname'>本站名：</label>
+						<div class=' col-lg-10'>
+							<input id='addNickname' class='form-control' name='username' onfocus="this.select()" readonly placeholder='昵称'>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class='col-lg-2 control-label' for='addWechat'>微信：</label>
+						<div class='col-lg-10'>
+							<input id='addWechat' class='form-control' name='wechat' onfocus="this.select()" disabled placeholder='微信'>
+						</div>
+					</div>
+					<div class="form-group hidden" id='divAddUsername'>
+						<label class='col-lg-2 control-label' for='addUsername'>用户名：</label>
+						<div class='col-lg-10'>
+							<input id='addUsername' class='form-control' name='nickname' onfocus="this.select()" disabled placeholder='学习站用户名'>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id='btn-modal-hide' data-dismiss="modal">取消</button>
+				<button type="submit" class="btn btn-primary" form='formUserAdd' onclick='userAddSure()'>添加</button>
+			</div>										
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+//{% if repeat %}
+//window.onload = function(){
+	//alert('昵称重复');
+//};
+//{% endif %}
+
+function downloadFile(fileName, content){
+	// 文档下载函数
+    var aLink = document.createElement('a');
+    var blob = new Blob([content]);
+    var evt = document.createEvent("HTMLEvents");
+    evt.initEvent("click", false, false); //initEvent 不加后两个参数在FF下会报错
+    aLink.download = fileName;
+    aLink.href = URL.createObjectURL(blob);
+    aLink.dispatchEvent(evt);
+}
+
+function dumpdata(){
+	document.getElementById('formDowload').onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest();
+		xhr.open('POST', f.action, true);
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				downloadFile('labuser.csv', rowNew);
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function hidSwith(){
+// 标签显示与隐藏
+	var tags = document.getElementsByClassName("hidSwith");
+	for(var i=0;i<tags.length;i++){
+		var classVal = tags[i].getAttribute("class");
+		if(classVal.match('hidden')){
+			classVal = classVal.replace('hidden', 'unhid');
+		}else{
+			classVal = classVal.replace('unhid', 'hidden');
+		};
+		tags[i].setAttribute("class", classVal);
+	};
+};
+
+function rename(){
+	// 重命名
+	var btnModOver = document.getElementById('btnModOver'),
+		btnUserAdd = document.getElementById('btnUserAdd'),
+		btnUserDel = document.getElementById('btnUserDel'),
+		btnModify = document.getElementById('btnModify'),
+		attrModify = btnModify.getAttribute('class'),
+		attrModOver = btnModOver.getAttribute('class');
+	attrModify += ' hidden';
+	attrModOver = attrModOver.replace('hidden', '');
+	btnModify.setAttribute('class', attrModify);
+	btnModOver.setAttribute('class', attrModOver);
+	btnUserAdd.setAttribute('disabled', true);
+	btnUserDel.setAttribute('disabled', true);
+	hidSwith();
+};
+
+function renameOver(){
+	// 重命名完毕
+	var xhr = new XMLHttpRequest(),
+		para = document.getElementById('userList');
+	xhr.open('GET', '?refresh=1', true);
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			var btnModOver = document.getElementById('btnModOver'),
+				btnUserAdd = document.getElementById('btnUserAdd'),
+				btnUserDel = document.getElementById('btnUserDel'),
+				btnModify = document.getElementById('btnModify'),
+				attrModify = btnModify.getAttribute('class'),
+				attrModOver = btnModOver.getAttribute('class');
+			attrModOver += ' hidden';
+			attrModify = attrModify.replace('hidden', '');
+			btnModify.setAttribute('class', attrModify);
+			btnModOver.setAttribute('class', attrModOver);
+			btnUserAdd.removeAttribute('disabled');
+			btnUserDel.removeAttribute('disabled');
+			para.innerHTML = xhr.responseText;
+			//hidSwith();
+		};
+	};
+	xhr.send();
+};
+
+function userDel(){
+	// js 删除成员
+	var tbHid = document.getElementsByClassName('tbHid'),
+		btnDelSure = document.getElementById('btnDelSure'),
+		btnUserAdd = document.getElementById('btnUserAdd'),
+		btnUserDel = document.getElementById('btnUserDel'),
+		btnModify = document.getElementById('btnModify'),
+		attrDelSure = btnDelSure.getAttribute('class'),
+		attrUserDel = btnUserDel.getAttribute('class');
+	for(var i=0;i<tbHid.length;i++){
+		tbHid[i].setAttribute('class', 'tbHid col-lg-1');
+	};
+	attrDelSure = attrDelSure.replace('hidden', '');
+	attrUserDel += ' hidden';
+	btnUserDel.setAttribute('class', attrUserDel);
+	btnDelSure.setAttribute('class', attrDelSure);
+	btnUserAdd.setAttribute('disabled', true);
+	btnModify.setAttribute('disabled', true);
+};
+
+function delSure(){
+	// form 确认删除成员
+	document.getElementById("formUserDel").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			btnDelSure = document.getElementById('btnDelSure'),
+			btnUserAdd = document.getElementById('btnUserAdd'),
+			btnModify = document.getElementById('btnModify'),
+			btnUserDel = document.getElementById('btnUserDel'),
+			attrDelSure = btnDelSure.getAttribute('class'),
+			attrUserDel = btnUserDel.getAttribute('class'),
+			para = document.getElementById('userList');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				para.innerHTML = rowNew;
+				document.getElementsByClassName('tbHid')[0].setAttribute('class', 'tbHid hidden col-lg-1');
+				attrDelSure += ' hidden';
+				attrUserDel = attrUserDel.replace('hidden', '');
+				btnUserDel.setAttribute('class', attrUserDel);
+				btnDelSure.setAttribute('class', attrDelSure);
+				btnUserAdd.removeAttribute('disabled');
+				btnModify.removeAttribute('disabled');
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function newAttrAdd(e, tagId){
+	// 新增用户名|微信
+	//document.getElementById('addNickname').setAttribute('readonly', true);
+	document.getElementById('addNickname').setAttribute('value', e.parentElement.parentElement.getElementsByClassName('username')[0].innerText);
+	//document.getElementById('addUsername').setAttribute('disabled', true);
+	document.getElementById('addUsername').setAttribute('value', e.parentElement.parentElement.getElementsByClassName('nickname')[0].innerText);
+	//document.getElementById('addWechat').setAttribute('disabled', true);
+	document.getElementById('addWechat').setAttribute('value', e.parentElement.parentElement.getElementsByClassName('wechat')[0].innerText);
+	
+	document.getElementById('divAddUsername').setAttribute('class', 'form-group');
+	document.getElementById(tagId).removeAttribute('disabled');
+	document.getElementById(tagId).removeAttribute('value');
+	document.getElementById(tagId).setAttribute('required', true);
+	document.getElementById('update').setAttribute('value', e.parentElement.parentElement.id);
+	document.getElementById('update').removeAttribute('disabled');
+	$('#userAddModal').modal('show');
+};
+
+$('#userAddModal').on('hidden.bs.modal', function (e) {
+	// 重置模态框数据及格式
+	document.getElementById('formUserAdd').reset();
+	document.getElementById('addNickname').setAttribute('readonly', true);
+	document.getElementById('addUsername').setAttribute('disabled', true);
+	document.getElementById('addWechat').setAttribute('disabled', true);
+	document.getElementById('update').setAttribute('disabled', true);
+	document.getElementById('divAddUsername').setAttribute('class', 'form-group hidden');
+	//document.getElementById('addNickname').removeAttribute('readonly');
+	//document.getElementById('addWechat').removeAttribute('disabled');
+	
+});
+
+function userAddSure(){
+	// 添加确认
+	// <!-- if(document.getElementById('divAddUsername').getAttribute('class')=='form-group'){ -->
+	// 	<!-- document.getElementById("formUserAdd").onsubmit = ''; -->
+	// <!-- }else{ -->
+	document.getElementById("formUserAdd").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest();
+		if(document.getElementById('divAddUsername').getAttribute('class')=='form-group'){
+			para = document.getElementById(document.getElementById('update').value);
+		}else{
+			para = document.getElementById('userList').insertRow(0);
+		};
+		$('#userAddModal').modal('hide');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				if(rowNew){
+					para.innerHTML = rowNew;
+					console.log('user' + para.getElementsByTagName('input')[0].value);
+					para.setAttribute('id', 'user' + para.getElementsByTagName('input')[0].value)
+				}else{
+					alert('本站名重复');
+				};
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function userAdd(){
+	// 添加成员 清除 modal 数据
+	// document.getElementById('formUserAdd').reset();
+	document.getElementById('addNickname').removeAttribute('value');
+	document.getElementById('addWechat').removeAttribute('value');
+	document.getElementById('addWechat').removeAttribute('disabled');
+	document.getElementById('addNickname').removeAttribute('readonly');
+};
+
+function inputThis(e){
+	// 得到焦点，开启输入框
+	// alert('1111' + name);
+	// alert(e.innerText);
+	// alert(e.className);
+	var para = e.parentElement,
+		name = e.className,
+		value = e.innerText,
+		uid = e.parentElement.parentElement.id.replace('user', '');
+	para.innerHTML = '<input class="form-control" placeholder="' +value+ '" onblur="inputThisSure(this,' + uid + ',\'' +name+ '\')">';
+	para.children[0].focus();
+};
+
+function inputThisSure(e, uid, name){
+	// 失去焦点，输入确认
+	// alert('222' + name);
+	// alert(e.placeholder);
+	var value = e.placeholder,
+		info = e.value.replace(/^\s+|\s+$/g,"");
+	if(info){					// 后台判断是否为空 TODO
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", "?"+name+"="+info+"&uid="+uid, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				if(xhr.responseText){
+					alert('本站名重复');
+					e.select();
+				}else{
+				e.parentElement.innerHTML = '<a href="#zz" class="' + name + '" style="color:red" onclick="inputThis(this)">' +info+ '</a>';
+				};
+			};
+		};
+		xhr.send();
+	}else{
+		e.parentElement.innerHTML = '<a href="#zz" class="' + name + '" style="color:red" onclick="inputThis(this)">' +value+ '</a>';
+	};
+};
+</script>
+{% endblock %}

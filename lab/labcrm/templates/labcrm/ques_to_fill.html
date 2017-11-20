@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}问卷{% endblock %}
+{% block header %}
+<h1 class='col-md-12 text-center'><a href='{% url "homepage" %}'>crossin编程实战训练营</a></h1>
+{% endblock %}
+{% block head_hr %}{% endblock %}
+{% block content %}
+<div class='col-md-12'>
+	<form action='{% url "crm:paper" %}' method='POST' id='formResult'>
+	{% csrf_token %}
+		<input class='hidden' name='data_key' value='{{ data_key }}'>
+		<h3 class='text text-center'>{{ title }}</h3>
+		<p class='text text-right'><em><b>TO -- </b></em><span id='username'>{{ labUser }}</span></p>
+		<p class='text'>{{ paper_desc }}</p>
+		{% for ques in questions %}
+		<hr />
+		<div class='row'>
+			<div class="form-group has-success col-lg-12">
+				<label class="col-lg-2 text-center" for='labUser{{ ques.aid }}'>{{ ques.desc }}</label>
+				<div class='col-lg-10'>
+				{% if ques.attr.is_option %}
+					{% for option in ques.attr.options.all %}
+					<div class='radio'>
+						<label>
+							<input type="radio" name="ques_value{{ ques.aid }}" value="{{ option.option }}" required=true>
+							{{ option.option }}
+						</label>
+					</div>
+					{% endfor %}
+				{% else %}
+					<input type='text' id='labUser{{ ques.aid }}' class='form-control' name='ques_value{{ ques.aid }}' onfocus="this.select()" placeholder='请填写' required=true>
+				{% endif %}
+				</div>
+				<div class='hidden'>
+					<input name='attr_id' value='{{ ques.aid }}'>
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+		<hr />
+		<div class='row'>
+			<div class='col-lg-10 col-lg-offset-1'>
+			{% if is_fill %}
+				<button class='btn form-group btn-lg btn-block btn-primary' id='btnIe' form='formResult' type='submit' onclick='paperPreview(this)'>预览/提交</button>
+			{% else %}
+				<a class='btn form-group btn-lg btn-block btn-primary'>预览/提交</a>
+			{% endif %}
+			</div>
+		</div>
+	</form>
+</div>
+{% if not is_fill %}
+	{% block data %}
+	{% include 'labcrm/ques_data.html' %}
+	{% endblock %}
+{% endif %}
+{% endblock %}
+{% block modal %}
+<div class="modal fade" id='paperModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">预览:</h4>
+			</div>
+			<div class="modal-body" id='paperModalBody'></div>
+			<div class="modal-footer">
+				<div class='col-lg-10 col-lg-offset-1'>
+					<button type="submit" class="btn btn-lg btn-block btn-success" id='btnIeSubmit' form='formResult'>提交</button>
+					<button type="button" class="btn btn-lg btn-block btn-danger" data-dismiss="modal">返回</button>
+				</div>
+			</div>										
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+var userAgent = navigator.userAgent; 
+var isOpera = userAgent.indexOf("Opera") > -1;
+var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera ;      
+if(isIE){
+	document.getElementById('btnIe').setAttribute('onclick', 'paperPreviewIe()');
+	document.getElementById('btnIe').setAttribute('type', '');
+	document.getElementById('btnIeSubmit').onclick = function(){
+		document.getElementById('formResult').submit();
+	};
+};
+
+function getCookie(name) {
+	var cookieValue = null;
+	if (document.cookie && document.cookie != '') {
+		var cookies = document.cookie.split(';');
+		for (var i = 0; i < cookies.length; i++) {
+			var cookie = cookies[i].trim();
+			// Does this cookie string begin with the name we want?
+			if (cookie.substring(0, name.length + 1) == (name + '=')) {
+				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+				break;
+			};
+		};
+	};
+	return cookieValue;
+};
+
+function paperPreviewIe(){
+	var para = document.getElementById('paperModalBody'),
+		xmlhttp = new XMLHttpRequest(),
+		url = document.getElementById("formResult").action,
+		data = '',
+		tags = document.getElementsByTagName('input');
+	for(var i=0;i<tags.length;i++){
+		data = data + tags[i].name + '=' + tags[i].value + '&';
+	};
+	xmlhttp.open('POST', url, true);
+	xmlhttp.onreadystatechange=function(){	
+		if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
+			var rowNew = xmlhttp.responseText;
+			para.innerHTML = rowNew;
+			if(para.innerHTML.length>0){
+					$('#paperModal').modal('show');
+				};
+		};
+	};
+	var csrftoken = getCookie('csrftoken');
+	xmlhttp.setRequestHeader('X-CSRFToken',csrftoken);
+	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	xmlhttp.send(data);
+};
+
+function paperPreview(tt){
+	document.getElementById("formResult").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			para = document.getElementById('paperModalBody');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				para.innerHTML = rowNew;
+				if(para.innerHTML.length>0){
+					$('#paperModal').modal('show');
+				};
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+$('#paperModal').on('shown.bs.modal', function () {
+	document.getElementById('formResult').action='';
+	document.getElementById("formResult").onsubmit = 0;
+});
+
+$('#paperModal').on('hidden.bs.modal', function () {
+	document.getElementById('formResult').action='{% url "crm:paper" %}';
+});
+</script>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,267 @@
+{% extends 'base2.html' %}
+{% block title %}问卷配置{% endblock %}
+{% block nav_bar %}
+	{% include 'labcrm/tools/nav_bar.html' with tag_conf="active" %}
+{% endblock %}
+{% block row-left %}
+	<input class='btn btn-success btn-block btn-lg hidden' id='btnCre' type='submit' form='quesCre' value='生成'><!--ques_data-->
+	<input class='btn btn-warning btn-block btn-lg hidden' id='btnPre' type='submit' form='formToFill' onclick='quesPre()' value='预览'><!--ques_to_fill-->
+	<input class='btn btn-info btn-block btn-lg' type='submit' form='quesConf' id='btnConf' value='配置' onclick='quesConf()'><!--preview-->
+	<button class='btn btn-info btn-block btn-lg' id='btnQuesAdd' data-toggle="modal" data-target="#quesAddModal">添加提问</button><hr />
+	<div class="panel panel-info">
+		<div class="panel-heading " role="tab" id="headingOne">
+			<h4 class="panel-title text-center">
+				<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">问卷列表</a>
+			</h4>
+		</div>
+		<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+		{% for paper in papers %}
+			<div style='border-bottom:1px #DDD solid'><a class='btn btn-link' href='{% url "crm:paper" %}/{{ paper.key }}{{ paper.user.id }}'>{{ paper }}</a></div>
+		{% endfor %}
+			<a class='btn btn-block btn-link' href='{% url "crm:papers" %}?PType=M'>更多</a>
+		</div>
+	</div>
+{% endblock %}
+{% block row-right %}
+<div class="row">
+	<div class="col-md-9" id='boxPreview'>
+		<table class="table table-hover table-striped table-bordered">
+			<caption>问卷配置</caption>
+			<thead class='thead-inverse'>
+				<tr>
+					<th>问题</th>
+					<th>提供选项</th>
+					<th class='col-md-1'>选用</th>
+					<th class='col-md-1'>删除</th>
+				</tr>
+			</thead>
+			<form method='POST' id='quesConf' action='{% url "crm:ajax:preview" %}'>
+			{% csrf_token %}
+			<tbody id='tbOptions'>
+				{% for attr in attrs %}
+				<tr id='attrTr{{ attr.id }}'>
+					<td>{{ attr.attr }}</td>
+					{% if attr.is_option %}
+					<td class='info' href="#collapse{{ attr.id }}" data-toggle="collapse">{{ attr.is_option }}</td>
+					{% else %}
+					<td>{{ attr.is_option }}</td>
+					{% endif %}
+					<td>
+						<label class="c-input c-checkbox">
+							<input type="checkbox" name='attr_checked' value='{{ attr.id }}'>
+							<span class="c-indicator"></span>
+						</label>
+					</td>
+					<td>
+						<button type="button" class="btn close btn-block" aria-label="Close" onclick='attrDel({{ attr.id }})'>
+							<span aria-hidden="true" style='color:red'>&times;</span>
+						</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+			</form>
+		</table>
+	</div>
+	<div class="col-md-3" id='optionDisplay'>
+	{% for attr in attrs %}
+		<div class="collapse" id="collapse{{ attr.id }}">
+			<ul class='list-group'>
+			{% for option in attr.options.all %}
+				<li class="list-group-item list-group-item-success">{{ option }}</li>
+			{% endfor %}
+			</ul>
+		</div>
+	{% endfor %}
+	</div>
+</div>
+{% endblock %}
+{% block modal %}
+<div class="modal fade" id='quesAddModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-md" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">添加提问:</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id='formQuesAdd' action='{% url "crm:ajax:add" %}' method='POST'>
+					{% csrf_token %}
+					<!--input class='hidden' id='inputPreview' name='is_preview'-->
+					<div class="form-group">
+						<label class='col-md-2 control-label' for='attr'>属性名：</label>
+						<div class='col-md-4'>
+							<input class='text form-control' id='attr' name='attr' placeholder='属性名' onfocus='this.select()' required>
+						</div>
+						<label class='col-md-4 control-label' for='check'>是否提供选项：</label>
+						<div class='col-md-2'>
+							<input class='form-control' id='check' name='is_option' type='checkbox' value=1 onchange='optionChange(this)'>
+						</div>
+					</div>
+					<hr />
+					<div id='optionGroup'></div>
+					<!--div class='hidden' id='checkedDivsBox'></div-->
+				</form>
+			</div>
+			<div class='hidden' id='btnMore'>
+				<div class='col-xs-4 col-xs-offset-4'>
+					<button class='btn btn-block btn-xs btn-primary' onclick='optionMore()'>▼</button>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id='btn-modal-hide' data-dismiss="modal">取消</button>
+				<button type="submit" class="btn btn-primary" form='formQuesAdd' onclick='quesAddSave()'>提交</button>
+			</div>										
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+function attrDel(aid){
+	// 删除属性
+	var attrTr = document.getElementById('attrTr'+aid),
+		xhr = new XMLHttpRequest();
+	xhr.open('GET', '?attrDel='+aid, true);
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			if(xhr.responseText == 'T'){
+				attrTr.parentElement.removeChild(attrTr);
+			};
+		};
+	};
+	xhr.send();
+}
+
+function quesConf(){
+	// ajax 配置
+	document.getElementById("quesConf").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			para = document.getElementById('boxPreview'),
+			btnConf = document.getElementById('btnConf'),
+			btnPre = document.getElementById('btnPre'),
+			btnQuesAdd = document.getElementById('btnQuesAdd'),
+			//inputPreview = document.getElementById('inputPreview'),
+			//checkedDivsBox = document.getElementById('checkedDivsBox'),
+			checkedDivs = document.getElementsByName('attr_checked'),
+			btnCreVal = btnPre.getAttribute('class');
+		btnCreVal = btnCreVal.replace('hidden', '');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				//for(var i=0;i<checkedDivs.length;i++){
+					//checkedDivsBox.appendChild(checkedDivs[0]);
+				//};
+				var rowNew = xhr.responseText;
+				para.innerHTML = rowNew;
+				btnQuesAdd.setAttribute('disabled', true);
+				btnConf.setAttribute('class', 'hidden');
+				btnPre.setAttribute('class', btnCreVal);
+				document.getElementById('optionDisplay').setAttribute('class', 'hidden');
+				//inputPreview.setAttribute('value', 1);
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function quesPre(){
+	// ajax 预览
+	document.getElementById("formToFill").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			para = document.getElementById('boxPreview'),
+			btnPre = document.getElementById('btnPre'),
+			btnCre = document.getElementById('btnCre'),
+			btnCreVal = btnCre.getAttribute('class');
+		btnCreVal = btnCreVal.replace('hidden', '');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				para.innerHTML = rowNew;
+				btnPre.setAttribute('class', 'hidden');
+				btnCre.setAttribute('class', btnCreVal);
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+optionId = 0 //  选项 id 计数， 全局变量
+
+function optionMore(){
+	// 更多选项
+	var para = document.getElementById('optionGroup');
+		newDiv = document.createElement('div');
+	optionId += 1
+	newDiv.innerHTML = '\
+		<div class="form-group">\
+			<label class="col-md-2 control-label" for="option' + optionId + '">选项名：</label>\
+			<div class="col-md-8">\
+				<input class="text form-control" id="option' + optionId + '" name="options" placeholder="选项名" onfocus="this.select()" required>\
+			</div>\
+			<div class="col-md-2">\
+				<input class="form-control btn btn-block btn-danger" type="button" value="X" onclick="optionDel(this)">\
+			</div>\
+		</div>'
+	para.appendChild(newDiv);
+}
+
+function optionChange(e){
+	// 是否提供选项
+	if(e.checked){
+		document.getElementById('btnMore').setAttribute('class', 'form-group');
+		optionMore();
+		optionMore();
+	}else{
+		document.getElementById('optionGroup').innerHTML='';
+		document.getElementById('btnMore').setAttribute('class', 'hidden');
+	};
+};
+
+function optionDel(e){
+	// 删除选项
+	var divToDel = e.parentElement.parentElement;
+	divToDel.parentElement.removeChild(divToDel);
+};
+
+function quesAddSave(){
+	// 添加提问提交
+	document.getElementById("formQuesAdd").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			divNew = document.createElement('div');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText.split('<!--optionDisplay-->');
+				/*
+				if(btnConf.className=='hidden'){
+					var para = document.getElementById('checkedDivsBox');
+						newInput = document.createElement('input');
+					para.appendChild(newInput);
+					newInput = 
+					document.getElementById('previewAttrs').innerHTML = (rowNew);
+					
+				}else{
+					document.getElementById('tbOptions').insertRow(0).innerHTML = rowNew;
+				};
+				*/
+				document.getElementById('tbOptions').insertRow(0).innerHTML = rowNew[0];
+				document.getElementById('optionDisplay').appendChild(divNew);
+				divNew.innerHTML = rowNew[1];
+				document.getElementById('btn-modal-hide').click();
+			};
+		};
+		xhr.send(formData);
+	};
+};
+</script>
+{% endblock %}

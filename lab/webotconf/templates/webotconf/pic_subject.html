@@ -1,0 +1,134 @@
+{% extends 'webotconf/webot.html' %}
+{% block buttons %}
+
+{% endblock %}
+{% block row-right %}
+<div class='jumbotron' id='subUnderway'>
+{% if subject %}
+	{% include 'webotconf/ajax/sub_underway.html' %}
+{% else %}
+	{% include 'webotconf/ajax/sub_create.html' %}
+{% endif %}
+</div>
+<hr />
+<div class='row'>
+	<h3>
+		<label>历史活动</label>
+		<span class='pull-right' id='subCount'>{{ subject_history.count }}</span>
+		<span class='pull-right'>活动总数：</span>
+	</h3>
+	<hr />
+	<div id="accordionSub" role="tablist" aria-multiselectable="true">
+	{% for subjectHis in subject_history %}
+		<div class="panel panel-default" id='subHistory{{ subjectHis.id }}'>
+			{% include 'webotconf/ajax/sub_history.html' %}
+		</div>
+	{% endfor %}
+	</div>
+</div>
+{% endblock %}
+{% block modal %}
+<div class="modal fade" id='subCreModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">开启新活动：</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id='formSubCre' action='' method='POST'>
+					{% csrf_token %}
+					<div class='form-group'>
+						<label class='control-label col-lg-1' for='subTag'>标签</label>
+						<div class='col-lg-10'>
+							<input class='form-control' name='tag' id='subTag' placeholder='标签' onfocus="this.select()" required=true>
+						</div>
+					</div>
+					<div class='form-group'>
+						<label class='control-label col-lg-1' for='subReply'>回复</label>
+						<div class='col-lg-10'>
+							<textarea class='form-control' name='reply' id='subReply' placeholder='回复' onfocus="this.select()" required=true rows=3></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id='btn-modal-hide' data-dismiss="modal">取消</button>
+				<button type="submit" class="btn btn-primary" form='formSubCre' onclick='subCreate()'>开启</button>
+			</div>										
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+function reSubBtnSwith(wake_it){
+	var reSubBtns = document.getElementsByClassName('reSubBtn')
+	if(wake_it){
+		for(var i=0;i<reSubBtns.length;i++){
+			reSubBtns[i].removeAttribute('disabled');
+		};
+	}else{
+		for(var i=0;i<reSubBtns.length;i++){
+			reSubBtns[i].setAttribute('disabled', true);
+		};
+	};
+};
+function subClose(sid){
+	var xhr = new XMLHttpRequest(),
+		para = document.getElementById('accordionSub'),
+		newDiv = document.createElement('div'),
+		subCount = document.getElementById('subCount'),
+		subUnderway = document.getElementById('subUnderway');
+	para.insertAdjacentElement('afterbegin', newDiv);
+	newDiv.setAttribute('class', 'panel panel-default');
+	newDiv.setAttribute('id', 'subHistory'+sid);
+	xhr.open('GET', '?close='+sid, true);
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			newDiv.innerHTML = xhr.responseText;
+			subCount.innerHTML = Number(subCount.innerHTML) + 1;
+			subUnderway.innerHTML = `{% include "webotconf/ajax/sub_create.html" %}`;
+			reSubBtnSwith(true);
+		};
+	};
+	xhr.send();
+};
+
+function subCreate(){
+	document.getElementById("formSubCre").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			para = document.getElementById('subUnderway');
+		$('#subCreModal').modal('hide');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				para.innerHTML = rowNew;
+				reSubBtnSwith(false);
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function reSub(sid){
+	var xhr = new XMLHttpRequest(),
+		para = document.getElementById('subUnderway'),
+		subHistory = document.getElementById('subHistory'+sid),
+		subCount = document.getElementById('subCount');
+	xhr.open('GET', '?reSub='+sid, true);
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			para.innerHTML = xhr.responseText;
+			subCount.innerHTML = Number(subCount.innerHTML) - 1;
+			subHistory.parentElement.removeChild(subHistory);
+			reSubBtnSwith(false);
+		};
+	};
+	xhr.send();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+<div class='hidden'>
+	<form action='' method='POST' id='quesCre'>
+	{% csrf_token %}
+		<input name='is_cre' value=true>
+		<input name='paper_title' value='{{ title }}'>
+		<input name='labUser' value='{{ labUser }}'>
+		<input name='paper_desc' value='{{ paper_desc }}'>
+		<input class='hidden' name='mark' value='{{ mark }}'>
+		{% for ques in questions2 %}
+			<input name='ques_desc' value='{{ ques.desc }}'>
+			<input name='attr_id' value='{{ ques.aid }}'>
+		{% endfor %}
+	</form>
+</div>

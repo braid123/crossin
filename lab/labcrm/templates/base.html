@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	{% load static %}
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel='stylesheet' type='text/css' href="{% static 'bootstrap3\css\bootstrap.min.css' %}" />
+	<link rel='stylesheet' type='text/css' href="{% static 'bootstrap3\css\bootstrap-theme.min.css' %}" />
+	<link rel='stylesheet' type='text/css' href="{% static 'bootstrap3\css\bootstrap-datetimepicker.min.css' %}" />
+	{% block link %}<link />{% endblock %}
+    <title>{% block title %}标题{% endblock %}</title>
+</head>
+<body class='container-fluid'>
+
+<header class='row'>
+	{% block header %}页眉{% endblock %}
+</header>
+
+{% block head_hr %}
+<hr />
+{% endblock %}
+
+<content class='row'>
+	{% block content %}内容{% endblock %}
+</content>
+
+<footer class='row'>
+	{% block footer %}
+		<p class='text-center'><b><a>***感谢访问***</a></b></p>
+	{% endblock %}
+</footer>
+
+{% block modal %}{% endblock %}
+<!--script src="http://code.jquery.com/jquery.js"></script-->
+<script src="{% static 'bootstrap3\js\jquery.min.js' %}" charset="UTF-8"></script>
+<script src="{% static 'bootstrap3\js\bootstrap.min.js' %}"></script>
+<script src="{% static 'bootstrap3\js\npm.js' %}"></script>
+<script src="{% static 'bootstrap3\js\moment.min.js' %}"></script>
+<script src="{% static 'bootstrap3\js\bootstrap-datetimepicker.min.js' %}" charset="UTF-8"></script>
+<script src="{% static 'bootstrap3\js\bootstrap-datetimepicker.zh-CN.js' %}" charset="UTF-8"></script>
+<script>
+function navbarLogin(){
+	var para = document.getElementById('fromNavbar');
+	para.onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest();
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				if(rowNew.length>0){
+					para.innerHTML = rowNew;
+				}else{
+					alert('用户名或密码错误！');
+				};
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function h(e) {
+	// textarea 高度自增长
+	if(e.scrollHeight<80){
+		$(e).css({'height':'auto','overflow-y':'hidden'}).height(84);
+	}else{
+		$(e).css({'height':'auto','overflow-y':'hidden'}).height(e.scrollHeight);
+	};
+};
+$('textarea').each(function () {
+	h(this);
+}).on('input', function () {
+	h(this);
+});
+</script>
+{% block script %}{% endblock %}
+</body>
+</html>

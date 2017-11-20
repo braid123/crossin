@@ -1,0 +1,57 @@
+<div class="row">
+<div class='col-md-12'>
+	<form id='form_details' action='' method='POST'>
+	{% csrf_token %}
+	<table class="table table-hover table-striped table-bordered">
+		<caption class='text-center'><h2>{{ labUser }}</h2></caption>
+		<thead class="thead-inverse">
+			<tr id='trQuestion'>
+				<th class='col-md-2'>属性</th>
+				<th class='col-md-9'>值</th>
+			</tr>
+		</thead>
+		<tbody id='tagTbInfo'>
+		{% if answers %}
+			{% for answer in answers %}
+			<tr class='trAnswer'>
+				<td>{{ answer.question }}</td>
+				<td><input class="form-control input-lg tagAnswer" name='tagAnswer' onfocus="this.select();" required=true placeholder='属性值' type="text" value="{{ answer }}" readonly></td>
+			</tr>
+			{% endfor %}
+		{% else %}
+			{% for attr in attrs %}
+			<tr class='trAnswer'>
+				<td>{{ attr.attr }}</td>
+				<td><input class="form-control input-lg tagAnswer" name='tagAnswer' onfocus="this.select();" required=true placeholder='属性值' type="text" readonly></td>
+			</tr>
+			{% endfor %}
+		{% endif %}
+		</tbody>
+	</table>
+	</form>
+</div>
+</div>
+<div class='row hidden' id='tagBtnHidden'>
+	<div class="col-md-4 col-md-offset-1 btn btn-primary" type='button' onclick='tagInfoAdd()'>增添信息</div>
+	<input class="col-md-4 col-md-offset-2 btn btn-primary" form='form_details' type='submit' value='确认修改' onclick='modifyComfirm()'>
+</div>
+<div class='row' id='dialog'>
+	<div class='col-md-12 form-group'>
+	{% if dialogs %}
+		{% for dialog in dialogs %}
+		<label>{{ dialog.log_time|date:"Y-m-d H:i:s" }} | {{ dialog.recorder }}</label>
+		<textarea class='form-control' readonly='readonly' rows=3>{{ dialog.dialog }}</textarea><hr />
+		{% endfor %}
+	{% endif %}
+	</div>
+</div>
+<div class='row' id='pic'>
+	<div class='col-md-12 form-group'>
+	{% if pics %}
+		{% for pic in pics %}
+		<label>{{ pic.pic.create_time|date:"Y-m-d H:i:s" }}</label>
+		<div><img src='{{ pic.pic.pic.url }}'></div>
+		{% endfor %}
+	{% endif %}
+	</div>
+</div>

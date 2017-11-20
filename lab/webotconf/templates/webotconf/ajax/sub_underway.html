@@ -1,0 +1,48 @@
+<div class="well well-lg">
+	<h2>
+		<label class='control-label' for='subClose'>当前活动：</label>
+		<button class='btn btn-danger pull-right' id='subClose' onclick='subClose({{ subject.id }})'>关闭活动</button>
+	</h2>
+	<hr />
+	<form class='form-horizontal'>
+		<div class='form-group'>
+			<label class='control-label col-md-1' for='subTag'>标签</label>
+			<div class='col-md-10'>
+				<input class='form-control' id='subTag' readonly value='{{ subject.tag }}'>
+			</div>
+		</div>
+		<div class='form-group'>
+			<label class='control-label col-md-1' for='subTime_on'>起始日</label>
+			<div class='col-md-10'>
+				<input class='form-control' readonly id='subTime_on' value='{{ subject.time_on|date:"Y-m-d" }}'>
+			</div>
+		</div>
+		<div class='form-group'>
+			<label class='control-label col-md-1' for='subReply'>回复</label>
+			<div class='col-md-10'>
+				<textarea class='form-control' id='subReply' readonly>{{ subject.reply }}</textarea>
+			</div>
+		</div>
+	</form>
+</div>
+<hr />
+<div class="panel panel-default">
+	<div class="panel-heading" role="tab" id="memberHead">
+		<h4 class="panel-title">
+			<a role="button" data-toggle="collapse" href="#collapseMember" aria-controls="collapseMember">
+				<span>参与成员</span>
+				<span class='pull-right'>{{ subject.members.all.count }}</span>
+				<span class='pull-right'>总数：</span>
+			</a>
+		</h4>
+	</div>
+	<div id="collapseMember" class="panel-collapse collapse" role="tabpanel" aria-labelledby="memberHead">
+		<div class="panel-body">
+		<ol>
+		{% for member in subject.members.all %}
+			<li><h5>{{ member.nickname }}</h5></li>
+		{% endfor %}
+		</ol>
+		</div>
+	</div>
+</div>	

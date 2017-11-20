@@ -1,0 +1,409 @@
+{% extends 'base2.html' %}
+{% block title %}详细信息{% endblock %}
+{% block row-left %}
+<div id="accordion" role="tablist" aria-multiselectable="true">
+	<!--div class="panel panel-default">
+		<div class="panel-heading" role="tab" id="headingOne">
+			<h4 class="panel-title text-center">
+				<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">用户列表</a>
+			</h4>
+		</div>
+		<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+			<ul>
+				<li>aaaa</li>
+				<li>aaaa</li>
+				<li>aaaa</li>
+				<li>aaaa</li>
+			</ul>
+		</div>
+	</div-->
+	<div class="panel panel-default">
+		<div class="panel-heading" role="tab" id="headingTwo">
+			<h4 class="panel-title text-center">
+				<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">选择问卷</a>
+			</h4>
+		</div>
+		<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+			<ul>
+			{% for paper in labUser.papers.all %}
+				<li><a target='_blank' class='' href='{% url "crm:paper" %}/{{ paper.key }}{{ paper.user.id }}'>{{ paper }}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+<div class='btns'>
+	<button class='btn btn-block btn-lg btn-info'>生成问卷</button>
+	<button class='btn btn-block btn-lg btn-info' id='btnModify' onclick='infoModify(this)'>修改资料</button>
+	<button class='btn btn-block btn-lg btn-info' data-toggle="modal" data-target="#dialogModal">添加记录</button>
+	<button class='btn btn-block btn-lg btn-danger hidden' id='tagCancel' onclick='modifyConcel()'>取消修改</button>
+</div>
+<hr />
+<a target='_blank' class='btn btn-block btn-lg btn-success' href='{% url "crm:courses" %}?uid={{ labUser.id }}'>学习记录</a>
+<a class='btn btn-block btn-lg btn-success' data-toggle="modal" data-target="#scheduleModal">更新进度</a>
+{% endblock %}
+{% block row-right %}
+{% include 'labcrm/ajax_user_detail.html' %}
+{% endblock %}
+{% block modal %}
+<div class="modal fade" id='dialogModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">沟通记录:</h4>
+			</div>
+			<div class="modal-body">
+				<form id='formDialog' action='' method='POST'>
+					{% csrf_token %}
+					<div class="form-group">
+						<textarea name='dialog' class="form-control" id="dialog-text" rows=3 placeholder='添加记录'></textarea>
+					</div>
+					<div class="form-group input-group" id='picDiv'>
+						<span class="input-group-addon" id='addonPic'><label for='inpPic' class='glyphicon glyphicon-cloud-upload'></label></span>
+						<input type='text' class="form-control" id='inpPicShow' placeholder="上传图片" aria-describedby="addonPic" name='pic_name'>
+						<input type="file" class='btn btn-md btn-block' name="pic" id="inpPic" accept="image/*" style='display:none'/>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id='btn-modal-hide' data-dismiss="modal">取消</button>
+				<button type="submit" class="btn btn-primary" form='formDialog' onclick='dialogSave()'>保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id='scheduleModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">更新进度:</h4>
+			</div>
+			<div class="modal-body">
+				<form id='formSchedule' action='{% url "crm:schedule" %}' method='POST'>
+					{% csrf_token %}
+					<table class="table table-hover table-striped table-bordered" id='table_schedule'>
+						<caption><h4 class='text-center'>课程进度<h4></caption>
+							<thead class='thead-inverse'>
+							<tr>
+								<th class='col-md-3'>课程</th>
+								<th class='col-md-2'>阶段</th>
+								<th class='col-md-6'>备注</th>
+								<th class='col-md-1'>删除</th>
+							</tr>
+							</thead>
+						<tbody id='courseList'>
+						{% for schedule in labUser.schedule.all %}
+							<tr ls_id={{ schedule.id }}>
+								<td>{{ schedule.get_course_id_display }}</td>
+								<td><a href='#' onclick='inputThis(this)' class='schedule'>{{ schedule.get_schedule_display }}</a></td>
+								<td><a href='#' onclick='inputThis(this)' class='note'>{{ schedule.note }}</a></td>
+								<td>
+									<button type="button" class="btn close btn-block" aria-label="Close" onclick="scheduleDel(this)">
+										<span aria-hidden="true" style="color:red">&times;</span>
+									</button>
+								</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+					<input class='hidden' name='user' value='{{ labUser.id }}'>
+				</form>
+			</div>
+			<div class='col-xs-4 col-xs-offset-4'>
+				<button class='btn btn-block btn-xs btn-primary' onclick='courseMore()'>▼</button>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id='btn-modal-hide' data-dismiss="modal">取消</button>
+				<button type="submit" class="btn btn-primary" form='formSchedule' onclick='scheduleSave()'>保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+var inpPic = document.getElementById('inpPic'),
+	inpPicShow = document.getElementById('inpPicShow');
+
+inpPic.onchange = function(){
+	inpPicShow.value=inpPic.value;
+};
+inpPicShow.onfocus = function(){
+	inpPic.click();
+	document.getElementById('dialog-text').focus();
+};
+
+function infoModify(e){
+	// 禁用按钮
+	e.setAttribute('disabled', 'true');
+	// 开启编辑
+	var tagsAanswer = document.getElementsByClassName("tagAnswer");
+	for(var i=0;i<tagsAanswer.length;i++){
+		tagsAanswer[i].removeAttribute("readonly");
+		var tagQuestion = tagsAanswer[i].parentNode.previousSibling.previousSibling
+		tagQuestion.innerHTML = '\
+		<fieldset class="form-group">\
+			<input class="form-control input-lg" name="tagQuestion" type="text" placeholder="新属性名" list="attrOption"\
+			onfocus="this.select();" onblur="questionJudge(this)" value="' + tagQuestion.innerHTML + '">\
+			<datalist id="attrOption">\
+			{% for attr in attrs %}\
+				<option value="{{ attr.attr }}">\
+			{% endfor %}\
+			</datalist>\
+		</fieldset>'
+	};
+	// 显示隐藏按钮
+	var tagBtnHidden = document.getElementById("tagBtnHidden");
+	var classVal = tagBtnHidden.getAttribute("class");
+	classVal = classVal.replace('hidden', '');
+	tagBtnHidden.setAttribute("class", classVal);
+	var tagCancel = document.getElementById("tagCancel");
+	var classVal2 = tagCancel.getAttribute("class");
+	classVal2 = classVal2.replace('hidden', '');
+	tagCancel.setAttribute("class", classVal2);
+	// 新增删除列表头
+	var tagTrQuestion = document.getElementById('trQuestion');
+	var tagThNew = document.createElement('th');
+	tagTrQuestion.appendChild(tagThNew);
+	tagThNew.setAttribute('id', 'delInfo');
+	tagThNew.innerHTML = '删除';
+	// 新增删除列
+	var tagsTrAnswer = document.getElementsByClassName('trAnswer');
+	for(var i=0;i<tagsTrAnswer.length;i++){
+		var tagTdNew = document.createElement('td');
+		tagsTrAnswer[i].appendChild(tagTdNew);
+		tagTdNew.innerHTML = '<input class="form-control btn-danger btn" type="button" value="X" onclick="infoDel(this)">';
+	};
+};
+
+function infoDel(e){
+	// 删除信息
+	document.getElementById('tagTbInfo').removeChild(e.parentNode.parentNode)
+};
+
+function questionJudge(e){
+	// 提供备选答案
+	{% for attr in attr_option %}
+		if('{{ attr.attr }}'==e.value){
+			e.parentNode.parentNode.nextSibling.nextSibling.innerHTML='\
+			<fieldset class="form-group">\
+				<input class="form-control input-lg" name="tagAnswer" type="text" placeholder="属性值" required=true list="valueOptions" onfocus="this.select();">\
+				<datalist id="valueOptions">\
+				{% for value in attr.options.all %}\
+					<option value="{{ value }}">\
+				{% endfor %}\
+				</datalist>\
+			</fieldset>'
+		}else{
+			e.parentNode.parentNode.nextSibling.nextSibling.innerHTML='\
+			<input class="form-control input-lg tagAnswer" name="tagAnswer" type="text" placeholder="属性值" required=true onfocus="this.select();">'
+		};
+	{% endfor %}
+};
+
+function tagInfoAdd(){
+	// 添加新属性
+	var tagTbInfo = document.getElementById('tagTbInfo');
+	var tagTrNew = document.createElement('tr');
+	tagTbInfo.appendChild(tagTrNew);
+	tagTrNew.setAttribute('class', 'trAnswer');
+	tagTrNew.innerHTML = '\
+	<td>\
+		<fieldset class="form-group">\
+			<input class="form-control input-lg" name="tagQuestion" type="text" placeholder="新属性名" list="attrOption" \
+			onfocus="this.select();" onblur="questionJudge(this)">\
+			<datalist id="attrOption">\
+			{% for attr in attrs %}\
+				<option value="{{ attr.attr }}">\
+			{% endfor %}\
+			</datalist>\
+		</fieldset>\
+	</td>\
+	<td><input class="form-control input-lg tagAnswer" name="tagAnswer" type="text" placeholder="属性值" required=true onfocus="this.select();"></td>\
+	<td><input class="form-control input-lg btn-danger btn" type="button" value="X" onclick="infoDel(this)"></td>'
+};
+
+function modifyComfirm(){
+	// ajax 返回修改确认后新结果
+	document.getElementById("form_details").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			para = document.getElementById('row-right'),
+			btnModify = document.getElementById('btnModify');
+			tagCancel = document.getElementById('tagCancel'),
+			tagCancelVal = tagCancel.getAttribute('class');
+		tagCancelVal += ' hidden'
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				para.innerHTML = rowNew;
+				btnModify.removeAttribute('disabled');
+				tagCancel.setAttribute('class', tagCancelVal);
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function modifyConcel(){
+	// 取消修改
+	var para = document.getElementById('row-right'),
+		xhr = new XMLHttpRequest(),
+		btnModify = document.getElementById('btnModify');
+		tagCancel = document.getElementById('tagCancel'),
+		tagCancelVal = tagCancel.getAttribute('class');
+	tagCancelVal += ' hidden'
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			var rowNew = xhr.responseText;
+			para.innerHTML = rowNew;
+			btnModify.removeAttribute('disabled');
+			tagCancel.setAttribute('class', tagCancelVal);
+		};
+	};
+	xhr.open("GET", '{% url "crm:detail" %}?uid={{ labUser.id }}&ajax=1', true);
+	xhr.send();
+};
+
+function dialogSave(){
+	//保存沟通记录
+	document.getElementById("formDialog").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			para = document.getElementById('row-right');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				para.innerHTML = rowNew;
+				document.getElementById('formDialog').reset();
+				document.getElementById('btn-modal-hide').click();
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function courseMore(){
+	// 新增课程
+	var para = document.getElementById('table_schedule');
+		newRow = para.insertRow();
+	newRow.innerHTML = '\
+		<td>\
+			<select class="form-control" name="course">\
+			{% for cid, course in courses %}\
+				<option value="{{ cid }}">{{ course }}</option>\
+			{% endfor %}\
+			</select>\
+		</td>\
+		<td>\
+			<input onclick="inputThis(this)" class="schedule form-control" placeholder="阶段" required></a>\
+		</td>\
+		<td><input class="form-control" placeholder="备注" name="note" required></td>\
+		<td>\
+			<button type="button" class="btn close btn-block" aria-label="Close" onclick="scheduleDel(this)">\
+				<span aria-hidden="true" style="color:red">&times;</span>\
+			</button>\
+		</td>'
+}
+
+function scheduleDel(e){
+	// 删除进度信息行
+	var tr = e.parentElement.parentElement,
+		ls_id = tr.getAttribute('ls_id');
+    console.log('ls_id is ',ls_id);
+	if(ls_id){
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', '{% url "crm:schedule" %}?del_sid='+ls_id, true);
+		xhr.send();
+	};
+	tr.parentElement.removeChild(tr);
+
+};
+
+$('#scheduleModal').on('hidden.bs.modal', function (e) {
+	// 重置模态框数据及格式
+	document.getElementById('formSchedule').reset();
+
+});
+
+function scheduleSave(){
+	// 保存新增进度
+	document.getElementById("formSchedule").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest();
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			window.location.reload();
+		};
+		xhr.send(formData);
+	};
+};
+
+function inputThis(e){
+	// 得到焦点，开启输入框
+	var para = e.parentElement,
+		ls_id = para.parentElement.getAttribute('ls_id'),
+		name = e.className,
+		value = e.innerText;
+	console.log('para is ',para);
+	console.log('ls_id is ', ls_id);
+	console.log('name is ',name);
+	console.log('value is ', value);
+	if(name=='note'){
+		para.innerHTML = '<input class="form-control" placeholder="备注" name="note" required value="' + value + '" onblur="inputThisSure(this,' + ls_id + ',\'' + name + '\')">';
+		para.firstElementChild.select();
+	}else{
+ 	    para.innerHTML = '<select class="form-control" name="schedule" onblur="inputThisSure(this,' + ls_id + ',\'' + name + '\')">\
+						{% for ls_id, schedule in schedules %}\
+							<option value="{{ ls_id }}">{{ schedule }}</option>\
+						{% endfor %}\
+						</select>'
+		showDropdown(para.firstElementChild);
+	};
+};
+
+function showDropdown (element) {
+	// <select> element displays its options on mousedown, not click.
+	// stack_overflow 大神代码，打开下拉列表
+    var event;
+    event = document.createEvent('MouseEvents');
+    event.initMouseEvent('mousedown', true, true, window);
+    element.dispatchEvent(event);
+};
+
+function inputThisSure(e, ls_id, name){
+	// 失去焦点，进度修改确认
+	var value = e.value
+	if(value && ls_id){
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", '{% url "crm:modify:schedule" %}?ls_id=' + ls_id + '&' + name + '=' + value, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				e.parentElement.innerHTML = '<a href="#" class="' + name + '" onclick="inputThis(this)">' + xhr.responseText + '</a>';
+			};
+		};
+		xhr.send();
+	}else if(!value){
+	    alert('该选项不能为空！');
+		e.focus();
+	};
+};
+
+</script>
+{% if not answers %}
+<script>
+window.onload = function(){
+	document.getElementById('btnModify').click();
+};
+</script>
+{% endif %}
+{% endblock %}

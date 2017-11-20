@@ -1,0 +1,25 @@
+{% extends 'labcrm/course_statistic.html' %}
+{% block schedule_class %}btn-primary{% endblock %}
+{% block row-right %}
+<table class="table table-hover table-striped table-bordered">
+	<caption><h3 class='text-center'>总体进度<h3></caption>
+		<thead class='thead-inverse'>
+		<tr>
+			<th>学员</th>
+			<th>课程</th>
+			<th>阶段</th>
+			<th>备注</th>
+		</tr>
+		</thead>
+	<tbody id='courseList'>
+	{% for schedule in schedules %}
+		<tr>
+			<td><a href='{% url "crm:courses" %}?uid={{ schedule.user.id }}'>{{ schedule.user }}</a></td>
+			<td>{{ schedule.get_course_id_display }}</td>
+			<td>{{ schedule.get_schedule_display }}</td>
+			<td>{{ schedule.note }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

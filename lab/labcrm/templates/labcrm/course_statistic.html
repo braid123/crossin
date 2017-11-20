@@ -1,0 +1,51 @@
+{% extends 'base2.html' %}
+{% block title %}完课统计{% endblock %}
+{% block nav_bar %}
+	{% include 'labcrm/tools/nav_bar.html' with tag_statis="active" %}
+{% endblock %}
+{% block row-left %}
+<a class='btn btn-lg btn-block {% block schedule_class %}btn-info{% endblock %}' href='{% url "crm:schedule" %}'>总体进度</a>
+<hr />
+<ul class="nav nav-pills nav-stacked nav-stacked text-center">
+{% for c in course_list %}
+	<li role="presentation" class="nav {% if course_id == c.index %}active{% endif %}"><a href='{% url "crm:statistic" %}?course={{ c.index }}'>{{ c.course }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
+{% block row-right %}
+<table class="table table-hover table-striped table-bordered">
+	<caption><h3 class='text-center'>{{ course }}<h3></caption>
+		<thead class='thead-inverse'>
+		<tr>
+			<th>学员</th>
+			<th>课程总数</th>
+			<th>最大课程进度</th>
+			<th>最后学习时间</th>
+			<th>期中项目</th>
+			<th>期末项目</th>
+			<th>学员所属群组</th>
+		</tr>
+		</thead>
+	<tbody id='courseList'>
+	{% for cd in course_data %}
+		<tr class='{% if cd.mid and cd.end %}success{% endif %}'>
+			<td><a href='{% url "crm:courses" %}?uid={{ cd.user.id }}'>{{ cd.user }}</a></td>
+			<td>{{ cd.amounts }}</td>
+			<td>{{ cd.max }}</td>
+			<td>{{ cd.latest|date:"Y-m-d" }}</td>
+			{% if cd.mid %}
+				<td><strong class='text-danger'>{{ cd.mid }}</strong></td>
+			{% else %}
+				<td>{{ cd.mid }}</td>
+			{% endif %}
+			{% if cd.end %}
+				<td><strong class='text-danger'>{{ cd.end }}</strong></td>
+			{% else %}
+				<td>{{ cd.end }}</td>
+			{% endif %}
+			<td>{{ cd.user.group.group_name }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

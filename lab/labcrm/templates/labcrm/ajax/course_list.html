@@ -1,0 +1,12 @@
+{% if add_new %}
+<td class='newIndex'></td>
+{% else %}
+<td>{{ forloop.revcounter }}</td>
+{% endif %}
+<td>{{ course.title }}</td>
+{% if course.is_inner %}
+<td>{{ course.learn_time|date:"Y-m-d H:i" }}</td>
+{% else %}
+<td>{{ course.learn_time|date:"Y-m-d" }}</td>
+{% endif %}
+<td>{{ course.is_inner }}</td>

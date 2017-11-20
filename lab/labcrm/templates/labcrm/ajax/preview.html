@@ -1,0 +1,54 @@
+<!-- 配置页面 para: ques_cond boxPreview -->
+<form method='POST' class="form-horizontal" action='' id='formToFill'>
+{% csrf_token %}
+	<div class="form-group has-warning">
+		<div class="col-md-10 col-md-offset-1">
+			<input type="text" class="form-control" name='paper_title' placeholder="标题" onfocus="this.select()">
+		</div>
+	</div>
+	<div class="form-group has-warning">
+		<label class='col-xs-1 control-label' for='mark'>标记</label>
+		<div class='col-xs-3'>
+			<input class='form-control' name='mark' id='mark' placeholder='标记'>
+		</div>
+		<label class="col-xs-1 col-xs-offset-4 control-label" for='labUser'>TO -- </label>
+		<fieldset class="form-group col-xs-3" id='labUser'>
+			<input class="form-control" name="labUser" type="text" placeholder="学员" list="userSelect">
+			<datalist id="userSelect">
+			{% for labUser in users %}
+				<option value="{{ labUser }}">
+			{% endfor %}
+			</datalist>
+		</fieldset>
+	</div>
+	<div class="form-group has-warning">
+		<div class="col-md-12">
+			<input type="textarea" class="form-control" name='paper_desc' placeholder="描述" onfocus="this.select()">
+		</div>
+	</div>
+	<div id='previewAttrs'>
+	{% for attr in attrs %}
+	<hr />
+	<div class="form-group has-success">
+		<label class="col-lg-2" for='labUser{{ attr.id }}'><input class='form-control' name='ques_desc' onfocus="this.select()" value={{ attr.attr }}></label>
+		<div class='col-lg-9 col-lg-offset-1'>
+		{% if attr.is_option %}
+			{% for option in attr.options.all %}
+			<div class='radio'>
+				<label>
+					<input type="radio" name="ques_value" value="{{ option.id }}" disabled>
+					{{ option.option }}
+				</label>
+			</div>
+			{% endfor %}
+		{% else %}
+			<input type='text' id='labUser{{ attr.id }}' class='form-control' name='ques_value' onfocus="this.select()" placeholder='请填写' disabled>
+		{% endif %}
+		</div>
+		<div class='hidden'>
+			<input name='attr_id' value='{{ attr.id }}'>
+		</div>
+	</div>
+	{% endfor %}
+	</div>
+</form>

@@ -1,0 +1,183 @@
+{% extends 'base2.html' %}
+{% block title %}群组划分{% endblock %}
+{% block nav_bar %}
+	{% include 'labcrm/tools/nav_bar.html' with tag_group="active" %}
+{% endblock %}
+{% block row-left %}
+<button id='btnAddGroup' class='btn btn-info btn-block btn-lg'  data-toggle="modal" data-target="#GroupAddModal" onclick="ResetGroupName()">添加分组</button>
+<hr />
+<ul class="nav nav-pills nav-stacked nav-stacked text-center">
+{% for group in groups %}
+	<li role="presentation" class="nav active ">
+		<a href='{% url "group:studentgroup"%}?group={{ group.id }}'>
+			{{ group.group_name }}
+		</a>
+	</li>
+{% endfor %}
+</ul>
+{% endblock %}
+{% block row-right %}
+<table class="table table-hover table-striped table-bordered">
+	<caption>
+		<h3 class='text-center'>
+			<span>群组列表</span>
+		</h3>
+	</caption>  
+	<thead class='thead-inverse'>
+		<tr>
+			<th><input  type="checkbox" name="all" onclick="allCheck(this)">群组ID</th>
+            <th>群组组名</th>
+			<th>本站名</th>
+			<th>微信</th>
+			<th>用户名</th>
+			<th>群组备注</th>
+		</tr>
+	</thead>
+	<tbody id='useringroup'>
+		{% for lab_user in users %}
+		{% if lab_user.group.id == group.id %}
+			<tr id='user{{ lab_user.id }}'>
+				<td>
+					<input type="checkbox" name="studentgroup" value="1" onclick="chose(this)">
+					<a href='{% url "group:studentgroup" %}?group={{ group.id}}'>
+				    {{ lab_user.group.id }}
+					</a>
+				</td>
+				<td>
+					{{ lab_user.group.group_name }}
+				</td>
+				<td class='unhid hidSwith'>
+					<a href='#zz' class='username' style='color:blue'>{{ lab_user }}</a>
+				</td>
+				<td class='unhid hidSwith'>
+					{{ lab_user.wechat }}
+				</td>
+				<td class='unhid hidSwith'>
+					{{ lab_user.nickname }}
+				</td>
+				<td>
+					{{ lab_user.group.group_note }}
+				</td>				
+			</tr>
+		{% endif %}
+		{% endfor %}
+	</tbody>
+</table>
+{% block changegroup %}
+<form action="" method="get"> 
+	<label>移动到：</label> 
+	<select name="selectgroup"  class="visible-lg-inline visible-sm-inline visible-md-inline" >
+			<option value=0 selected>=== 已有群组 ===</option> 
+			{% for group in groups %}
+				<option value={{group.id}}>{{ group.group_name }}</option>		
+			{% endfor %}  
+	</select>
+	<input type="button" id="btnChangeGroup" value="提交" onclick="ChangeUserGroup(this)"/> 
+</form> 
+{% endblock %}
+{% endblock %}
+{% block modal %}
+<div class="modal fade" id='GroupAddModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">添加新的分组：</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id='formGroupAdd' action='' method='POST'>
+					{% csrf_token %}
+					<input class='hidden' name='update' id='update' disabled>
+					<div class="form-group">
+						<label class='col-lg-2 control-label' for='addGroupname'>群组名：</label>
+						<div class='col-lg-10'>
+							<input id='addGroupname' class='form-control' name='groupname' onfocus="this.select()">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class='col-lg-2 control-label' for='addGroupNote'>群备注：</label>
+						<div class='col-lg-10'>
+							<input id='addGroupNote' class='form-control' name='groupnote' onfocus="this.select()">
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id='btn-modal-hide' data-dismiss="modal">取消</button>
+				<button type="submit" class="btn btn-primary" form='formGroupAdd' onclick='AddGroupName()'>添加</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+function allCheck(node1){
+	var node=document.getElementsByName("studentgroup");
+	for (var x = 0; x < node.length; x++) {
+		node[x].checked=node1.checked;
+	}
+};
+/*
+当所有的状态都选中全选自动选上
+*/
+function chose(node){
+	var flag=true;//用于遍历是否是全部变量设置
+	var allM=document.getElementsByName("all")[0];
+	var node=document.getElementsByName("studentgroup");
+	for (var x = 0; x < node.length; x++) {
+		if(node[x].checked==false){//只要有一个没选中，就退出遍历，标记设置为false
+			flag=false;
+			break;
+		}
+	}
+	if(flag){
+		allM.checked=true;
+	}else{
+		allM.checked=false;
+	}
+};
+
+function ResetGroupName(){
+	$("#addGroupname").val("");
+	$("#addGroupNote").val("");
+};
+
+function AddGroupName(){
+	// 添加确认
+	// 群名不可重复
+	document.getElementById("formGroupAdd").onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+            elem_li = document.createElement('button'); // 生成一个button元素
+		elem_li.setAttribute("class","btn btn-info btn-block btn-lg");//设置元素属性
+		elem_li.setAttribute("id","grouplist");//设置元素属性
+		document.querySelector('#row-left > ul').append(elem_li); // 添加到UL中去
+		// para = document.getElementById('grouplist').insertRow(0);
+		$('#GroupAddModal').modal('hide');
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				if(rowNew){
+					elem_li.innerHTML = rowNew;
+				}else{
+					alert('本群名重复');
+				};
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function ChangeUserGroup(){
+	console.log('Enter the ChangeUserGroup');
+};
+
+function ShowOneGroupUser(){
+    console.log('Enter the ShowOneGroupUser');
+};
+</script>
+{% endblock %}
+

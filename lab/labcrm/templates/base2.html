@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block header %}
+{% block h1 %}{% endblock %}
+<nav class="col-md-12 navbar navbar-default{% block topfix %} navbar-fixed-top{% endblock %}">
+	<div class='container-fluid'>
+		{% block homepage %}
+		<p class='navbar-text navbar-center'><a class='navbar-link' href='{% url "homepage" %}'>crossin编程实战训练营</a></p>
+		{% endblock %}
+		{% block nav_bar %}
+			{% include 'labcrm/tools/nav_bar.html' %}
+		{% endblock  %}
+		<form class="navbar-form navbar-right" action='{% url "accounts:login" %}' id='fromNavbar' method='POST'>
+		{% csrf_token %}
+		{% if user.is_authenticated %}
+			<label>欢迎您：{{ user }}</label>
+			<a class="btn btn-default" href='{% url "accounts:logout" %}'>登出</a>
+		</form>
+		{% else %}
+			<div class="form-group">
+				<input name='username' type="text" class="form-control" placeholder="用户名">
+				<input name='password' type="password" class="form-control" placeholder="密码">
+			</div>
+			<button type="submit" class="btn btn-default" onclick='navbarLogin()'>登录</button>
+		</form>
+		{% endif %}
+	</div>
+</nav>
+{% endblock %}
+{% block content %}
+{% block content_hr %}
+<hr />
+{% endblock %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-2" id="row-left">
+			{% block row-left %}
+			{% endblock %}
+		</div>
+		<div class="col-md-10" id="row-right">
+			{% block row-right %}
+			{% endblock %}
+		</div>
+	</div>
+</div>
+{% endblock %}

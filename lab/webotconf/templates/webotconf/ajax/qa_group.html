@@ -1,0 +1,43 @@
+{% if is_strict_qa %}
+<form class='form-horizontal' id='form{{ keyword.id }}'>
+{% else %}
+#js_split#{{ keyword.id }}#js_split#
+{% endif %}
+<hr />
+	{% csrf_token %}
+	<input class='hidden' name='modify' value='1'>
+	<div class="form-group">
+		<label class="control-label col-lg-1" for='kw{{ keyword.id }}'>关键字</label>
+		<div class="col-lg-3">
+			<input type='text' id='kw{{ keyword.id }}' class="form-control" name='keyword' onfocus='select()' placeholder='关键字' value='{{ keyword }}' readonly>
+		</div>
+		<button class='pull-right btn btn{{ keyword.id }} btn-danger unhid' form='' onclick='QADelete("{{ keyword.id }}")'>删除</button>
+		<button class='pull-right btn btn{{ keyword.id }} btn-info unhid modify' form='' onclick='QAModify("{{ keyword.id }}")'>修改</button>
+		<button class='pull-right btn btn{{ keyword.id }} btn-success hidden' onclick='modifySure("{{ keyword.id }}")'>保存</button>
+		<button class='pull-right btn btn{{ keyword.id }} btn-danger hidden' form='' onclick='modifyCancel("{{ keyword.id }}")'>取消</button>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-lg-1" for='desc{{ keyword.id }}'>描述</label>
+		<div class="col-lg-11">
+			<input type='text' id='desc{{ keyword.id }}' class="form-control inp{{ keyword.id }}" name='desc' onfocus='select()' placeholder='描述' value='{{ keyword.replies.last.desc }}' readonly=true required>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-lg-1" for='answ{{ keyword.id }}'>回答</label>
+		<div class="col-lg-11">
+		<textarea id='answ{{ keyword.id }}' class='form-control inp{{ keyword.id }}' name='answer' onfocus='select()' placeholder='回答' readonly=true required rows=3>{{ keyword.replies.last.reply_text }}</textarea>
+		<div class="input-group btn{{ keyword.id }} hidden" id="picDiv{{ keyword.id }}">
+			<span class="input-group-addon" id="addonPic{{ keyword.id }}"><label for="inpPic{{ keyword.id }}" class="glyphicon glyphicon-cloud-upload"></label></span>
+			<input type="text" class="form-control" id="inpPicShow{{ keyword.id }}" placeholder="上传图片" aria-describedby="addonPic{{ keyword.id }}" name="pic_name">
+			<input type="file" class="btn btn-md btn-block" name="pic" id="inpPic{{ keyword.id }}" accept="image/*" style="display:none">
+		</div>
+		{% if keyword.replies.last.is_pic %}
+			<div id='pic{{ keyword.id }}'>
+				<img src='{{ keyword.replies.last.reply_pic.url }}'>
+			</div>
+		{% endif %}
+		</div>
+	</div>
+{% if is_strict_qa %}
+</form>
+{% endif %}

@@ -1,0 +1,53 @@
+<!--
+{% if is_preview %}
+	{% for attr in attrs %}
+	<hr />
+	<div class="form-group has-success">
+		<label class="col-lg-2" for='labUser{{ attr.id }}'><input class='form-control' name='ques_desc' onfocus="this.select()" value={{ attr.attr }}></label>
+		<div class='col-lg-9 col-lg-offset-1'>
+		{% if attr.is_option %}
+			{% for option in attr.options.all %}
+			<div class='radio disabled'>
+				<label>
+					<input type="radio" name="ques_value" value="{{ option.id }}">
+					{{ option.option }}
+				</label>
+			</div>
+			{% endfor %}
+		{% else %}
+			<input type='text' id='labUser{{ attr.id }}' class='form-control' name='ques_value' onfocus="this.select()" placeholder='请填写' disabled>
+		{% endif %}
+		</div>
+		<div class='hidden'>
+			<input name='attr_id' value='{{ attr.id }}'>
+		</div>
+	</div>
+	{% endfor %}
+{% else %}
+-->
+	<td>{{ attr.attr }}</td>
+	{% if attr.is_option %}
+	<td class='info' href="#collapse{{ attr.id }}" data-toggle="collapse">{{ attr.is_option }}</td>
+	{% else %}
+	<td>{{ attr.is_option }}</td>
+	{% endif %}
+	<td>
+		<label class="c-input c-checkbox">
+			<input type="checkbox" name='attr_checked' value='{{ attr.id }}' form='quesConf' checked>
+			<span class="c-indicator"></span>
+		</label>
+	</td>
+	<td>
+		<button type="button" class="btn close btn-block" aria-label="Close" onclick='attrDel({{ attr.id }})'>
+			<span aria-hidden="true" style='color:red'>&times;</span>
+		</button>
+	</td>
+	<!--optionDisplay-->
+	<div class="collapse" id="collapse{{ attr.id }}">
+		<ul class='list-group'>
+		{% for option in attr.options.all %}
+			<li class="list-group-item list-group-item-success">{{ option }}</li>
+		{% endfor %}
+		</ul>
+	</div>
+<!--{% endif %}-->

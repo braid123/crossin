@@ -1,0 +1,111 @@
+{% extends 'base2.html' %}
+{% block title %}学习记录{% endblock %}
+{% block row-left %}
+<button id='btncourseAdd' class='btn btn-info btn-block btn-lg' data-toggle="modal" data-target="#courseModal">添加课程</button>
+{% endblock %}
+{% block row-right %}
+<table class="table table-hover table-striped table-bordered">
+	<caption class='text-center'><h3><a href='{% url "crm:detail" %}?uid={{ lab_user.id }}'>{{ lab_user }}</a></a></h3></caption>
+	<thead class='thead-inverse'>
+	<tr>
+		<th class='col-lg-1'>序号</th>
+		<th class='col-lg-8'>课程标题</th>
+		<th class='col-lg-2'>学习时间</th>
+		<th class='col-lg-1'>内部课程</th>
+	</tr>
+	</thead>
+	<tbody id='courseList'>
+	{% for course in courses %}
+		<tr {% if not course.is_inner %}class='warning'{% endif %}>
+			{% include 'labcrm/ajax/course_list.html' %}
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
+{% block modal %}
+<div class="modal fade" id='courseModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">添加课程：</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id='formCourse' action='' method='POST'>
+					{% csrf_token %}
+					<div class="form-group">
+						<label class='col-md-2 control-label' for='courseName'>课程名：</label>
+						<div class='col-md-10'>
+							<input id='courseName' class='form-control' name='courseTitle' onfocus="this.select()" placeholder='课程名'>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="dtp_input" class="col-md-2 control-label">日期：</label>
+						<div class='col-md-10'>
+							<div class="input-group date form_datetime">
+								<input name='courseTime' class="form-control" type="text" readonly placeholder='学习日期'>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class='col-md-2 control-label' for='is_inner'>站内课：</label>
+						<div class='col-md-10'>
+							<input id='is_inner' class='form-control' disabled value='False'>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id='btn-modal-hide' data-dismiss="modal">取消</button>
+				<button type="submit" class="btn btn-primary" form='formCourse' onclick='courseAddSure()'>添加</button>
+			</div>										
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script type="text/javascript">
+$('.form_datetime').datetimepicker({
+	language: 'zh-CN',
+	format: "yyyy-mm-dd",
+	weekStart: 1,
+	todayBtn:  1,
+	autoclose: 1,
+	todayHighlight: 1,
+	startView: 2,
+	minView: 2,
+	forceParse: 0,
+	showMeridian: 1
+});
+
+$('#courseModal').on('hidden.bs.modal', function (e) {
+	// 重置模态框数据及格式
+	document.getElementById('formCourse').reset();
+});
+
+function courseAddSure(){
+	// 添加课程确认
+	console.log('添加课程确认');
+	document.getElementById('formCourse').onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest(),
+			para = document.getElementById('courseList').insertRow(0);
+		xhr.open('POST', f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				console.log(para);
+				para.setAttribute('class', 'warning');
+				para.innerHTML = xhr.responseText;
+				para.getElementsByClassName('newIndex')[0].innerText = parseInt(para.nextElementSibling.firstElementChild.innerText)+1;
+			};
+		};
+		xhr.send(formData);
+		$('#courseModal').modal('hide');
+	};
+};
+</script>
+{% endblock %}

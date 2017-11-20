@@ -1,0 +1,39 @@
+{% for paper in papers %}
+<tr class='text-center' id='paper{{ paper.id }}'>
+	<td>
+		<a target='_blank' class='btn btn-link' href='{% url "crm:paper" %}/{{ paper.key }}{{ paper.user.id }}'>{{ paper }}</a>
+	</td>
+	{% if PType != 'M' %}
+	<td>
+		{% if paper.user %}
+		<a target='_blank' class='btn btn-link' href='{% url "crm:detail" %}?uid={{ paper.user.id }}'>{{ paper.user }}</a>
+		{% else %}
+			-
+		{% endif %}
+	</td>
+	{% endif %}
+	<td>
+		{{ paper.create_time|date:"Y-m-d H:i:s" }}
+	</td>
+	{% if PType == 'A' or PType == 'F' %}
+	<td>
+		{% if paper.finished_time %}
+			{{ paper.finished_time|date:"Y-m-d H:i:s" }}
+		{% else %}
+			-
+		{% endif %}
+	</td>
+	{% endif %}
+	<td>
+	{% if paper.is_fill %}
+		<a tabindex="0" class="btn close btn-block" aria-label="Close" role="button" data-toggle="popover" data-placement="left" data-trigger="focus"  data-content="无法删除已填写问卷" disabled>
+			<span aria-hidden="true" style='color:red'>&times;</span>
+		</a>
+	{% else %}
+		<button type="button" class="btn close btn-block" aria-label="Close" onclick='paperDel({{ paper.id }})'>
+			<span aria-hidden="true" style='color:red'>&times;</span>
+		</button>
+	{% endif %}
+	</td>
+</tr>
+{% endfor %}

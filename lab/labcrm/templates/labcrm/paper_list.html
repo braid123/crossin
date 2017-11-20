@@ -1,0 +1,68 @@
+{% extends 'base2.html' %}
+{% block title %}问卷列表{% endblock %}
+{% block quesConf %}active{% endblock %}
+{% block row-left %}
+<ul class="nav nav-pills nav-stacked nav-stacked text-center">
+	<!--li role="presentation" class="nav {% if PType == 'M' %}active{% endif %}"><a href='#' onclick='linkTurn("M")'>问卷模版</a></li-->
+	<li role="presentation" class="nav {% if PType == 'M' %}active{% endif %}"><a href='?PType=M'>问卷模版</a></li>
+	<li role="presentation" class="nav {% if PType == 'TF' %}active{% endif %}"><a href='?PType=TF'>未填问卷</a></li>
+	<li role="presentation" class="nav {% if PType == 'F' %}active{% endif %}"><a href='?PType=F'>已填问卷</a></li>
+	<li role="presentation" class="nav {% if PType == 'A' %}active{% endif %}"><a href='?PType=A'>全部问卷</a></li>
+	<li role="presentation" class="nav {% if PType != 'N' %}hidden{% endif %} active"><a href='#'>新建问卷</a></li>
+</ul>
+{% endblock %}
+{% block row-right %}
+<table class="table table-hover table-striped table-bordered">
+	<caption class='text-center'><h2>问卷列表</h2></caption>
+		<thead class='thead-inverse'>
+		<tr>
+			<th class='text-center'>问卷名</th>
+			{% if PType != 'M' %}
+			<th class='text-center'>调查对象</th>
+			{% endif %}
+			<th class='text-center'>创建时间</th>
+			{% if PType == 'A' or PType == 'F' %}
+			<th class='text-center'>填写时间</th>
+			{% endif %}
+			<th class='col-lg-1 text-center'>删除</th>
+		</tr>
+		</thead>
+	<tbody id='userList'>
+	{% include 'labcrm/ajax/papers.html' %}
+	</tbody>
+</table>
+{% endblock %}
+{% block script %}
+<script>
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+
+function paperDel(pid){
+	var trDel = document.getElementById('paper'+pid),
+		xhr = new XMLHttpRequest();
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			if(xhr.responseText=='T'){
+				trDel.parentElement.removeChild(trDel);
+			};
+		};
+	};
+	xhr.open("GET", '?paperDel='+pid, true);
+	xhr.send();
+};
+/*
+function linkTurn(type){
+	var para = document.getElementById('userList'),
+		xhr = new XMLHttpRequest();
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			para.innerHTML = xhr.responseText;
+		};
+	};
+	xhr.open("GET", '{% url "crm:papers" %}?PType='+type, true);
+	xhr.send();
+}
+*/
+</script>
+{% endblock %}

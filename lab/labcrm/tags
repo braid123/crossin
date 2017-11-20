@@ -1,0 +1,152 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+AttrOption	.\models.py	/^class AttrOption(models.Model):$/;"	c
+AttrOptionAdmin	.\admin.py	/^class AttrOptionAdmin(admin.ModelAdmin):$/;"	c
+AttrOptionInline	.\admin.py	/^class AttrOptionInline(admin.TabularInline):$/;"	c
+Dialog	.\models.py	/^class Dialog(models.Model):$/;"	c
+DialogAdmin	.\admin.py	/^class DialogAdmin(admin.ModelAdmin):$/;"	c
+DialogInline	.\admin.py	/^class DialogInline(admin.TabularInline):$/;"	c
+ImgForm	.\views.py	/^class ImgForm(forms.Form):$/;"	c
+InfoAInline	.\admin.py	/^class InfoAInline(admin.TabularInline):$/;"	c
+InfoQInline	.\admin.py	/^class InfoQInline(admin.TabularInline):$/;"	c
+LabUser	.\models.py	/^class LabUser(models.Model):$/;"	c
+LabUserAdmin	.\admin.py	/^class LabUserAdmin(admin.ModelAdmin):$/;"	c
+LabcrmConfig	.\apps.py	/^class LabcrmConfig(AppConfig):$/;"	c
+LearnedCourse	.\models.py	/^class LearnedCourse(models.Model):$/;"	c
+Migration	.\migrations\0001_initial.py	/^class Migration(migrations.Migration):$/;"	c
+Migration	.\migrations\0002_learnedcourse.py	/^class Migration(migrations.Migration):$/;"	c
+Migration	.\migrations\0003_learnedcourse_is_inner.py	/^class Migration(migrations.Migration):$/;"	c
+Migration	.\migrations\0004_labuser_ta.py	/^class Migration(migrations.Migration):$/;"	c
+Migration	.\migrations\0005_learnedcourse_course_id.py	/^class Migration(migrations.Migration):$/;"	c
+Migration	.\migrations\0006_auto_20170912_1638.py	/^class Migration(migrations.Migration):$/;"	c
+Migration	.\migrations\0007_auto_20170912_1639.py	/^class Migration(migrations.Migration):$/;"	c
+Migration	.\migrations\0008_labuser_statistic.py	/^class Migration(migrations.Migration):$/;"	c
+Paper	.\models.py	/^class Paper(models.Model):$/;"	c
+PaperAdmin	.\admin.py	/^class PaperAdmin(admin.ModelAdmin):$/;"	c
+PaperInline	.\admin.py	/^class PaperInline(admin.TabularInline):$/;"	c
+PicData	.\models.py	/^class PicData(models.Model):$/;"	c
+UserAttr	.\models.py	/^class UserAttr(models.Model):$/;"	c
+UserAttrAdmin	.\admin.py	/^class UserAttrAdmin(admin.ModelAdmin):$/;"	c
+UserInfoA	.\models.py	/^class UserInfoA(models.Model):$/;"	c
+UserInfoAAdmin	.\admin.py	/^class UserInfoAAdmin(admin.ModelAdmin):$/;"	c
+UserInfoQ	.\models.py	/^class UserInfoQ(models.Model):$/;"	c
+UserInfoQAdmin	.\admin.py	/^class UserInfoQAdmin(admin.ModelAdmin):$/;"	c
+UserPic	.\models.py	/^class UserPic(models.Model):$/;"	c
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:AttrOption	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:Dialog	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:LabUser	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:LearnedCourse	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:Paper	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:PicData	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:UserAttr	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:UserInfoA	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:UserInfoQ	file:
+__str__	.\models.py	/^    def __str__(self):$/;"	m	class:UserPic	file:
+_id	.\models.py	/^    class_id = models.IntegerField(verbose_name='教室ID', blank=True, null=True)$/;"	c	class:LabUser
+_id	.\views.py	/^                LabUser.objects.filter(id=uid).update(nickname=nickname, class_id=None)$/;"	c	function:_user_list_get
+_id	.\views.py	/^                LabUser.objects.filter(id=uid).update(nickname=nickname, class_id=cid)$/;"	c	function:_user_list_get
+_id	.\views.py	/^                LabUser.objects.filter(user=user).update(nickname=nickname, class_id=cid)$/;"	c	function:_user_list_post
+_id	.\views.py	/^        '''.format(uid=lab_user.class_id, last_time=last_time))$/;"	c	class:_learning_schedule_get/_id
+_id	.\views.py	/^        cid = user.class_id$/;"	c	class:link_to_class/_id
+_id	.\views.py	/^    if lab_user.class_id:$/;"	c	function:_learning_schedule_get
+_id	.\views.py	/^    if user.class_id:$/;"	c	function:link_to_class
+_id	.\views.py	/^    print('class_id:\\t', user.class_id)$/;"	c	function:link_to_class
+_learning_schedule_get	.\views.py	/^def _learning_schedule_get(request, lab_user):$/;"	f
+_learning_schedule_post	.\views.py	/^def _learning_schedule_post(request, lab_user):$/;"	f
+_save_schedule	.\views.py	/^def _save_schedule(lab_user, info):$/;"	f
+_save_uiq_uia	.\views.py	/^def _save_uiq_uia(user, attr, answer):$/;"	f
+_set_course_statistic	.\views.py	/^def _set_course_statistic(lab_user, *data):$/;"	f
+_user_detail_get	.\views.py	/^def _user_detail_get(request, lab_user):$/;"	f
+_user_detail_post	.\views.py	/^def _user_detail_post(request, lab_user):$/;"	f
+_user_list_get	.\views.py	/^def _user_list_get(request):$/;"	f
+_user_list_post	.\views.py	/^def _user_list_post(request):$/;"	f
+addNew	.\templates\labcrm\paper_display.html	/^function addNew(){$/;"	f
+addNewSrue	.\templates\labcrm\paper_display.html	/^function addNewSrue(e){$/;"	f
+ajax_conf_add	.\views.py	/^def ajax_conf_add(request):$/;"	f
+ajax_conf_preview	.\views.py	/^def ajax_conf_preview(request):$/;"	f
+ajax_detail_modify	.\views.py	/^def ajax_detail_modify(request):$/;"	f
+ajax_new_user	.\views.py	/^def ajax_new_user(request):$/;"	f
+ajax_user_del	.\views.py	/^def ajax_user_del(request):$/;"	f
+attrDel	.\templates\labcrm\ques_conf.html	/^function attrDel(aid){$/;"	f
+ault	.\migrations\0001_initial.py	/^                ('is_del', models.BooleanField(default=False, verbose_name='是否删除')),$/;"	m	class:Migration
+ault	.\migrations\0001_initial.py	/^                ('is_fill', models.BooleanField(default=False, verbose_name='是否填写')),$/;"	m	class:Migration
+ault	.\migrations\0001_initial.py	/^                ('is_option', models.BooleanField(default=False, verbose_name='是否提供选项')),$/;"	m	class:Migration
+ault	.\migrations\0001_initial.py	/^                ('mark', models.CharField(default='默认', max_length=50, verbose_name='标记')),$/;"	m	class:Migration
+ault	.\migrations\0001_initial.py	/^                ('pic_type', models.CharField(default='NoType', max_length=30, verbose_name='图片类型')),$/;"	m	class:Migration
+ault	.\migrations\0003_learnedcourse_is_inner.py	/^            field=models.BooleanField(default=True, verbose_name='内部课程'),$/;"	m	class:Migration
+ault	.\migrations\0004_labuser_ta.py	/^            field=models.CharField(default='暂无', max_length=30, verbose_name='助教'),$/;"	m	class:Migration
+ault	.\migrations\0005_learnedcourse_course_id.py	/^            field=models.IntegerField(default=0, verbose_name='科目ID'),$/;"	m	class:Migration
+ault	.\migrations\0006_auto_20170912_1638.py	/^            field=models.IntegerField(choices=[(0, '课外课程'), (1, 'Python 零基础入门'), (2, '爬虫实战')], default=0, max_length=2, verbose_name='科目ID'),$/;"	m	class:Migration
+ault	.\migrations\0007_auto_20170912_1639.py	/^            field=models.IntegerField(choices=[(0, '课外课程'), (1, 'Python 零基础入门'), (2, '爬虫实战')], default=0, verbose_name='科目ID'),$/;"	m	class:Migration
+ault	.\migrations\0008_labuser_statistic.py	/^            field=models.TextField(default='{}', verbose_name='完课统计'),$/;"	m	class:Migration
+ault	.\models.py	/^    course_id = models.IntegerField(verbose_name='科目ID', default=0, choices=COURSE_CHOICES)$/;"	m	class:LearnedCourse
+ault	.\models.py	/^    is_del = models.BooleanField(verbose_name='是否删除', default=False)$/;"	m	class:LabUser
+ault	.\models.py	/^    is_del = models.BooleanField(verbose_name='是否删除', default=False)$/;"	m	class:Paper
+ault	.\models.py	/^    is_del = models.BooleanField(verbose_name='是否删除', default=False)$/;"	m	class:UserAttr
+ault	.\models.py	/^    is_del = models.BooleanField(verbose_name='是否删除', default=False)$/;"	m	class:UserInfoA
+ault	.\models.py	/^    is_del = models.BooleanField(verbose_name='是否删除', default=False)$/;"	m	class:UserInfoQ
+ault	.\models.py	/^    is_fill = models.BooleanField(verbose_name='是否填写', default=False)$/;"	m	class:Paper
+ault	.\models.py	/^    is_inner = models.BooleanField(verbose_name='内部课程', default=True)$/;"	m	class:LearnedCourse
+ault	.\models.py	/^    is_option = models.BooleanField(verbose_name='是否提供选项', default=False)$/;"	m	class:UserAttr
+ault	.\models.py	/^    mark = models.CharField(verbose_name='标记', max_length=50, default='默认')$/;"	m	class:Paper
+ault	.\models.py	/^    pic_type = models.CharField(verbose_name='图片类型', max_length=30, default='NoType')$/;"	m	class:UserPic
+ault	.\models.py	/^    statistic = models.TextField(verbose_name='完课统计', default='{}')$/;"	m	class:LabUser
+ault	.\models.py	/^    ta = models.CharField(max_length=30, verbose_name='助教', default='暂无')$/;"	m	class:LabUser
+aults	.\views.py	/^            defaults={$/;"	f	function:_save_schedule
+aults	.\views.py	/^        attr, _ = UserAttr.objects.update_or_create(attr=attr, defaults={$/;"	f	function:ajax_conf_add
+aults	.\views.py	/^        defaults={'answer': answer}$/;"	f	function:_save_uiq_uia
+aults	.\views.py	/^        defaults={'learn_time': datetime.datetime.strptime(learn_time, '%Y-%m-%d')}$/;"	f	function:_learning_schedule_post
+aults	.\views.py	/^        pic_obj, _ = PicData.objects.get_or_create(pic=pic, defaults={$/;"	f	function:_user_detail_post
+courseAddSure	.\templates\labcrm\courses.html	/^function courseAddSure(){$/;"	f
+course_data_generator	.\views.py	/^def course_data_generator(course_id):$/;"	f
+course_index	.\views.py	/^def course_index():$/;"	f
+delSure	.\templates\labcrm\user_list.html	/^function delSure(){$/;"	f
+dialogSave	.\templates\labcrm\user_detail.html	/^function dialogSave(){$/;"	f
+getCookie	.\templates\labcrm\ques_to_fill.html	/^function getCookie(name) {$/;"	f
+get_class_id	.\views.py	/^def get_class_id(nickname):$/;"	f
+get_course_format	.\views.py	/^def get_course_format(lab_user, data):$/;"	f
+h	.\templates\base.html	/^function h(e) {$/;"	f
+hidSwith	.\templates\labcrm\user_list.html	/^function hidSwith(){$/;"	f
+infoDel	.\templates\labcrm\user_detail.html	/^function infoDel(e){$/;"	f
+infoModify	.\templates\labcrm\user_detail.html	/^function infoModify(e){$/;"	f
+inputThis	.\templates\labcrm\user_list.html	/^function inputThis(e){$/;"	f
+inputThisSure	.\templates\labcrm\user_list.html	/^function inputThisSure(e, uid, name){$/;"	f
+learning_schedule	.\views.py	/^def learning_schedule(request):$/;"	f
+linkTurn	.\templates\labcrm\paper_list.html	/^function linkTurn(type){$/;"	f
+link_to_class	.\views.py	/^def link_to_class(request):$/;"	f
+modifyComfirm	.\templates\labcrm\user_detail.html	/^function modifyComfirm(){$/;"	f
+modifyConcel	.\templates\labcrm\user_detail.html	/^function modifyConcel(){$/;"	f
+navbarLogin	.\templates\base.html	/^function navbarLogin(){$/;"	f
+newAttrAdd	.\templates\labcrm\user_list.html	/^function newAttrAdd(e, tagId){$/;"	f
+optionChange	.\templates\labcrm\ques_conf.html	/^function optionChange(e){$/;"	f
+optionDel	.\templates\labcrm\ques_conf.html	/^function optionDel(e){$/;"	f
+optionMore	.\templates\labcrm\ques_conf.html	/^function optionMore(){$/;"	f
+paperDel	.\templates\labcrm\paper_list.html	/^function paperDel(pid){$/;"	f
+paperPreview	.\templates\labcrm\ques_to_fill.html	/^function paperPreview(tt){$/;"	f
+paperPreviewIe	.\templates\labcrm\ques_to_fill.html	/^function paperPreviewIe(){$/;"	f
+paper_display	.\views.py	/^def paper_display(request, data_key=None):$/;"	f
+papers_create	.\views.py	/^def papers_create(request):$/;"	f
+quesAddSave	.\templates\labcrm\ques_conf.html	/^function quesAddSave(){$/;"	f
+quesConf	.\templates\labcrm\ques_conf.html	/^function quesConf(){$/;"	f
+quesPre	.\templates\labcrm\ques_conf.html	/^function quesPre(){$/;"	f
+ques_conf	.\views.py	/^def ques_conf(request):$/;"	f
+ques_fill	.\views.py	/^def ques_fill(request, data_key=None):$/;"	f
+questionJudge	.\templates\labcrm\user_detail.html	/^function questionJudge(e){$/;"	f
+questions	.\views.py	/^            def questions():$/;"	f	function:ques_conf
+questions	.\views.py	/^    def questions():$/;"	f	function:paper_display
+questions	.\views.py	/^    def questions():$/;"	f	function:ques_fill
+reName	.\templates\labcrm\paper_display.html	/^function reName(){$/;"	f
+reNameSure	.\templates\labcrm\paper_display.html	/^function reNameSure(){$/;"	f
+rename	.\templates\labcrm\user_list.html	/^function rename(){$/;"	f
+renameOver	.\templates\labcrm\user_list.html	/^function renameOver(){$/;"	f
+subject_statistic	.\views.py	/^def subject_statistic(request):$/;"	f
+tagInfoAdd	.\templates\labcrm\user_detail.html	/^function tagInfoAdd(){$/;"	f
+userAdd	.\templates\labcrm\user_list.html	/^function userAdd(){$/;"	f
+userAddSure	.\templates\labcrm\user_list.html	/^function userAddSure(){$/;"	f
+userDel	.\templates\labcrm\user_list.html	/^function userDel(){$/;"	f
+user_detail	.\views.py	/^def user_detail(request, new_id=None):$/;"	f
+user_list	.\views.py	/^def user_list(request):$/;"	f

@@ -1,0 +1,208 @@
+{% extends 'webotconf/webot.html' %}
+{% block buttons %}
+<button type="button" id='btnkw' class="btn btn-info btn-lg btn-block unhid hidSwith" onclick='kwAdd(this)'>增加关键字</button>
+{% endblock %}
+{% block row-right %}
+{% if is_strict_qa == 'True' %}
+<h3 class='text text-center'>严格问答配置</h3>
+{% else %}
+<h3 class='text text-center'>宽松问答配置</h3>
+{% endif %}
+<div id='qa_list'>
+	{% for keyword in keywords %}
+		{% include 'webotconf/ajax/qa_group.html' %}
+	{% endfor %}
+</div>
+{% endblock %}
+{% block script %}
+<script>
+var kw = desc = answ = '';
+
+function kwAdd(e){
+	// 新增关键字
+	e.setAttribute('disabled', true);
+	var para = document.getElementById("qa_list"),
+		newForm = document.createElement("form");
+	para.insertBefore(newForm, para.firstElementChild);
+	newForm.setAttribute('id', 'newForm');
+	newForm.setAttribute('class', 'form-horizontal has-success');
+	newForm.innerHTML = '\
+	<hr />' + "{% csrf_token %}" + '\
+	<div class="form-group">\
+		<label class="control-label col-lg-1" for="kw00">关键字：</label>\
+		<div class="col-lg-3">\
+			<input type="text" id="kw00" class="form-control inputs" name="keyword" onfocus="select()" placeholder="关键字" required>\
+		</div>\
+		<button class="pull-right btn btn-success" form="newForm" type="submit" onclick="QASave()">保存</button>\
+		<button class="pull-right btn btn-danger" form="" onclick="QACancel()">取消</button>\
+	</div>\
+	<div class="form-group">\
+		<label class="control-label col-lg-1" for="desc00">描述：</label>\
+		<div class="col-lg-11">\
+			<input type="text" id="desc00" class="form-control inputs" name="desc" onfocus="select()" placeholder="描述" required>\
+		</div>\
+	</div>\
+	<div class="form-group">\
+		<label class="control-label col-lg-1" for="answ00">回答：</label>\
+		<div class="col-lg-11">\
+			<textarea id="answ00" class="form-control inputs" name="answer" onfocus="select()" placeholder="回答" required rows=3></textarea>\
+			<div class="input-group" id="picDiv">\
+				<span class="input-group-addon" id="addonPic"><label for="inpPic" class="glyphicon glyphicon-cloud-upload"></label></span>\
+				<input type="text" class="form-control" id="inpPicShow" placeholder="上传图片" aria-describedby="addonPic" name="pic_name">\
+				<input type="file" class="btn btn-md btn-block" name="pic" id="inpPic" accept="image/*" style="display:none">\
+			</div>\
+		</div>\
+	</div>'
+	
+	$('textarea').each(function () {
+		h(this);
+	}).on('input', function () {
+		h(this);
+	});
+	
+	var inpPic = document.getElementById('inpPic'),
+	inpPicShow = document.getElementById('inpPicShow');
+	inpPic.onchange = function(){
+		inpPicShow.value=inpPic.value;
+	};
+	inpPicShow.onfocus = function(){
+		inpPic.click();
+		document.getElementById('answ00').focus();
+	};
+};
+
+function QACancel(){
+	// 取消新增
+	var newFormCancel = document.getElementById('newForm');
+	newFormCancel.parentNode.removeChild(newFormCancel);
+	document.getElementById('btnkw').removeAttribute('disabled');
+};
+
+function QASave(){
+	// 新关键字保存
+	document.getElementById('newForm').onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			para = document.getElementById("qa_list"),
+			newForm = document.createElement('form'),
+			xhr = new XMLHttpRequest();
+		para.insertBefore(newForm, para.firstElementChild);
+		newForm.setAttribute('class', 'form-horizontal has-success');
+		xhr.open("POST", '', true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				if(rowNew){
+					QACancel();
+					newForm.innerHTML = rowNew.split('#js_split#')[2];
+					newForm.setAttribute('id', 'form'+rowNew.split('#js_split#')[1]);
+				}else{
+					alert('关键字重复！');
+				};
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function QASwith(id){
+	// 样式控制转换
+	var btns = document.getElementsByClassName("btn"+id),
+		inps = document.getElementsByClassName("inp"+id),
+		mods = document.getElementsByClassName('modify');
+	for(var i=0;i<btns.length;i++){
+		// 问答组按钮转换
+		var classVal = btns[i].getAttribute("class");
+		if(classVal.match('hidden')){
+			classVal = classVal.replace('hidden', 'unhid');
+		}else{
+			classVal = classVal.replace('unhid', 'hidden');
+		};
+		btns[i].setAttribute("class", classVal);
+	};
+	for(var i=0;i<inps.length;i++){
+		// 输入控件转换
+		if(inps[i].getAttribute('readonly')){
+			inps[i].removeAttribute('readonly');
+		}else{
+			inps[i].setAttribute('readonly', true);
+		};
+	};
+	for(var i=0;i<mods.length;i++){
+		// 修改按钮转换
+		if(mods[i].getAttribute('disabled')){
+			mods[i].removeAttribute('disabled');
+		}else{
+			mods[i].setAttribute('disabled', true);
+		};
+	};
+};
+
+function QAModify(id){
+	// 关键字修改
+	kw = document.getElementById('kw'+id).value;
+	desc = document.getElementById('desc'+id).value;
+	answ = document.getElementById('answ'+id).value;
+	QASwith(id);
+	
+	var inpPic = document.getElementById('inpPic'+id),
+	inpPicShow = document.getElementById('inpPicShow'+id);
+	inpPic.onchange = function(){
+		inpPicShow.value=inpPic.value;
+	};
+	inpPicShow.onfocus = function(){
+		inpPic.click();
+		document.getElementById('answ'+id).focus();
+	};
+};
+
+function modifyCancel(id){
+	// 关键字修改取消
+	document.getElementById('kw'+id).value = kw;
+	document.getElementById('desc'+id).value = desc;
+	document.getElementById('answ'+id).value = answ;
+	QASwith(id);
+	kw = desc = answ = '';
+};
+
+function modifySure(id){
+	// 关键字修改保存
+	var para = document.getElementById('form'+id);
+	para.onsubmit = function(e){
+		e.preventDefault();
+		var f = e.target,
+			formData = new FormData(f),
+			xhr = new XMLHttpRequest();
+		xhr.open('POST', '', true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				//if(rowNew){
+					//QASwith();
+					//para.innerHTML = rowNew.split('#js_split#')[2];
+				//}else{
+					//alert('关键字重复！');
+				//};
+				QASwith();
+				para.innerHTML = rowNew.split('#js_split#')[2];
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function QADelete(id){
+	// 关键字组删除
+	var xhr = new XMLHttpRequest(),
+		form = document.getElementById('form'+id);
+	xhr.open('GET', '?delete='+id, true);
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			form.parentNode.removeChild(form);
+		};
+	};
+	xhr.send();
+};
+</script>
+{% endblock %}

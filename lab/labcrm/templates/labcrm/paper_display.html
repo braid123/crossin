@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% block title %}问卷预览{% endblock %}
+{% block header %}
+	<h1 class='text-center'><a href=''>crossin编程实战训练营</a></h1>
+{% endblock %}
+{% block head_hr %}{% endblock %}
+{% block content %}
+<div class='col-md-12'>
+	<form>
+		<h3 class='text text-center'>{{ title }}</h3>
+		<p class='text text-right'><em><b>TO -- </b></em><span id='username'>{{ labUser }}</span></p>
+		<p class='text'>{{ paper_desc }}</p>
+		{% for ques in questions %}
+		<hr />
+		<div class='row'>
+			<div class="form-group has-success col-lg-12">
+				<label class="col-lg-2 text-center" for='labUser{{ ques.aid }}'>{{ ques.desc }}</label>
+				<div class='col-lg-10'>
+				{% if ques.attr.is_option %}
+					{% for option in ques.attr.options.all %}
+					<div class='radio' id='labUser{{ ques.aid }}'>
+						<label>
+						{% if option.option == ques.value %}
+							<input type="radio" value="{{ option.option }}" checked disabled>
+						{% else %}
+							<input type="radio" value="{{ option.option }}" disabled>
+						{% endif %}
+							{{ option.option }}
+						</label>
+					</div>
+					{% endfor %}
+				{% else %}
+					<input type='text' id='labUser{{ ques.aid }}' class="form-control" placeholder='请填写' value='{{ ques.value }}' disabled>
+				{% endif %}
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</form>
+</div>
+{% endblock %}
+{% block footer %}
+<p class='text-center'><b><a>***感谢访问***</a></b></p>
+<hr />
+<hr />
+{% endblock %}
+{% block modal %}
+{% if user.is_staff and not modal_display %}
+<div class='row'>
+	<nav class="col-md-12 navbar navbar-default navbar-fixed-bottom">
+		<div class='container-fluid'>
+			<p class='navbar-text navbar-left'><b>管理员菜单</b></p>
+			<p class='navbar-text navbar-left'><label>欢迎您：{{ user }}</label></p>
+			<p class='navbar-text navbar-center'><a class='navbar-link' href='{% url "homepage" %}'>crossin编程实战训练营</a></p>
+			{% include 'labcrm/tools/nav_bar.html' %}
+			<form class='navbar-form navbar-right'>
+			{% if paper.user %}
+				<a tabindex="0" class="btn close pull-left" aria-label="Close" role="button" data-toggle="popover" data-placement="top" data-trigger="focus"  data-content="无法重命名非模板问卷" disabled>
+					<span aria-hidden="true" style='font-size:0.6em'>{{ paper }}</span>
+				</a>
+			{% else %}
+				<a class='btn' id='navName' onclick='reName()'>{{ paper }}</a>
+				<input class='hidden' id='navMark' placeholder='{{ paper.mark }}' value='{{ paper.mark }}' onfocus='this.select()' onblur='reNameSure()'>
+				<span class='hidden' id='navTime'>{{ paper.create_time|date:"Y-m-d" }}</span>
+			{% endif %}
+			{% if not filled %}
+				{% if labUser %}
+				<a class="btn btn-success" href='{% url "crm:fill2" %}/{{ data_key }}'>生成问卷</a>
+				{% else %}
+				<a class="btn btn-success" data-toggle="modal" data-target="#userListModal">生成问卷</a>
+				{% endif %}
+			{% endif %}
+			</form>
+		</div>
+	</nav>
+</div>
+{% if not labUser %}
+<div class="modal fade" id='userListModal' tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">生成问卷：</h4>
+			</div>
+			<div class="modal-body">
+				<form id='formPaperCre' method='POST' action='{% url "crm:papers" %}'>
+				{% csrf_token %}
+				<input class='hidden' name='data_key' value='{{ data_key }}'>
+				<table class="table table-hover table-striped table-bordered">
+					<caption>
+						<b>成员列表</b>
+						<button class='pull-right btn btn-primary' form='' onclick='addNew()'>新成员</button>
+					</caption>
+					<thead class='thead-inverse'>
+						<tr id='tr_papers'>
+							<th>昵称</th><!-- 昵称为本站 user.username -->
+							<th>微信</th>
+							<th>助教</th>
+							<th>问卷</th>
+							<th>入学日期</th>
+							<th>沟通记录</th>
+							<th>新问卷</th>
+						</tr>
+					</thead>
+					<tbody id='userList'>
+					{% include 'labcrm/ajax/user_del.html' %}
+					</tbody>
+				</table>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id='btn-modal-hide' data-dismiss="modal">取消</button>
+				<button type="submit" class="btn btn-success" id='btnCreate' form='formPaperCre'>生成</button>
+			</div>										
+		</div>
+	</div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
+{% block script %}
+<script>
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+
+function addNew(){
+	// 添加新成员
+	var newRow = document.getElementById('userList').insertRow(0),
+		tr_papers = document.getElementById('tr_papers'),
+		btnCreate = document.getElementById('btnCreate'),
+		th_papers = document.getElementsByTagName('th');
+	// console.log(th_papers, th_papers.length);
+	for(var i=0;i<th_papers.length-1;i++){
+		var cell = newRow.insertCell();
+		cell.innerHTML = '<td><input class="form-control" disabled placeholder="' + th_papers[i].innerText + '"></td>';
+		// console.log(cell);
+	};
+	newRow.insertCell().innerHTML = '<td><input type="checkbox" name="userId" checked disabled></td>';
+	newRow.firstElementChild.firstElementChild.setAttribute('name', 'nickname');
+	newRow.firstElementChild.firstElementChild.setAttribute('onblur', 'addNewSrue(this)');
+	newRow.firstElementChild.firstElementChild.removeAttribute('disabled');
+	newRow.setAttribute('class', 'success');
+	newRow.children[0].children[0].focus();
+	btnCreate.setAttribute('disabled', true);
+};
+
+function addNewSrue(e){
+	// 添加新成员确认
+	var btnCreate = document.getElementById('btnCreate');
+	if(e.value.length > 0){					// 后台判断是否为空 TODO
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", '{% url "crm:ajax:new" %}?nickname=' + e.value, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				if(xhr.responseText.length > 0){
+					var uid = xhr.responseText,
+						td = e.parentElement,
+						checkbox = td.parentElement.children[td.parentElement.childElementCount - 1].children[0],
+						tds = td.parentElement.getElementsByTagName('td');
+					console.log(tds.length);
+					for(var i=1;i<tds.length-1;i++){
+						console.log(11111, tds[i].firstElementChild.getAttribute('placeholder'));
+						tds[i].innerText = tds[i].firstElementChild.getAttribute('placeholder');
+					};
+					td.innerHTML = '<a href=\'{% url "crm:detail" %}?uid=' + uid + "'>" + e.value + '</a>';
+					checkbox.value = uid;
+					checkbox.removeAttribute('disabled');
+					btnCreate.removeAttribute('disabled');
+				}else{
+					alert('用户名重复');
+					e.select();
+				};
+			};
+		};
+		xhr.send();
+	}else{
+		var tr = e.parentElement.parentElement;
+		tr.parentElement.removeChild(tr);
+		btnCreate.removeAttribute('disabled');
+	};
+};
+
+function reName(){
+	var navMark = document.getElementById('navMark'),
+		navName = document.getElementById('navName'),
+		navTime = document.getElementById('navTime');
+	navName.className = 'hidden';
+	navMark.className = 'form-control';
+	navTime.className = 'text-primary';
+	navMark.focus();
+};
+
+function reNameSure(){
+	var xhr = new XMLHttpRequest(),
+		navMark = document.getElementById('navMark'),
+		navName = document.getElementById('navName'),
+		navTime = document.getElementById('navTime');
+	xhr.open("GET", '?reName=' + navMark.value, true);
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			navTime.className = 'hidden';
+			navMark.className = 'hidden';
+			navName.className = 'btn';
+			navName.innerText = xhr.responseText;
+		};
+	};
+	xhr.send();
+};
+</script>
+{% endblock %}
+</body>
+</html>

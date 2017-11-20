@@ -1,0 +1,155 @@
+{% extends 'base2.html' %}
+{% block title %}微信配置{% endblock %}
+{% block nav_bar %}
+	{% include 'labcrm/tools/nav_bar.html' with tag_webot="active" %}
+{% endblock %}
+{% block row-left %}
+<ul class="nav nav-pills nav-stacked nav-stacked text-center">
+<!--
+{% if is_strict == 'True' %}
+	<li role="presentation" class="nav"><a href='{% url "webot:rule" %}?strict='>宽松入群规则</a></li>
+	<li role="presentation" class="nav active"><a href='{% url "webot:rule" %}?strict=1'>严格入群规则</a></li>
+{% elif is_strict == 'False' %}
+	<li role="presentation" class="nav active"><a href='{% url "webot:rule" %}?strict='>宽松入群规则</a></li>
+	<li role="presentation" class="nav"><a href='{% url "webot:rule" %}?strict=1'>严格入群规则</a></li>
+{% endif %}-->
+	<li role="presentation" class="nav {% if is_strict == 'False' %}active{% endif %}"><a href='{% url "webot:rule" %}?strict='>宽松入群规则</a></li>
+	<li role="presentation" class="nav {% if is_strict == 'True' %}active{% endif %}"><a href='{% url "webot:rule" %}?strict=1'>严格入群规则</a></li>
+	<!--li role="presentation" class="nav {% if is_strict_qa == 'False' %}active{% endif %}"><a href='{% url "webot:qa" %}'>宽松问答配置</a></li-->
+	<li role="presentation" class="nav {% if is_strict_qa == 'False' %}active{% endif %}"><a href='#'>宽松问答配置</a></li>
+	<li role="presentation" class="nav {% if is_strict_qa == 'True' %}active{% endif %}"><a href='{% url "webot:qas" %}'>严格问答配置</a></li>
+	<li role="presentation" class="nav {% if is_pic %}active{% endif %}"><a href='{% url "webot:pic" %}'>活动图片回复</a></li>
+</ul>
+<hr />
+{% block buttons %}
+<button type="button" class="btn btn-info btn-lg btn-block unhid hidSwith" onclick='ruleConf()'>更改配置</button>
+<button type="submit" class="btn btn-success btn-lg btn-block hidden hidSwith" form='tagForm' onclick='confSave()'>保存配置</button>
+<button type="button" class="btn btn-danger btn-lg btn-block hidden hidSwith" onclick='confCancel()'>取消更改</button>
+{% endblock %}
+{% endblock %}
+{% block row-right %}
+{% include 'webotconf/ajax/rules.html' %}
+{% endblock %}
+{% block script %}
+<script>
+function hidSwith(){
+// 按钮显示与隐藏
+	var btns = document.getElementsByClassName("hidSwith");
+	for(var i=0;i<btns.length;i++){
+		var classVal = btns[i].getAttribute("class");
+		if(classVal.match('hidden')){
+			classVal = classVal.replace('hidden', 'unhid');
+		}else{
+			classVal = classVal.replace('unhid', 'hidden');
+		};
+		btns[i].setAttribute("class", classVal);
+	};
+};
+
+function ruleConf(){
+	// ajax 入群规则配置
+	hidSwith();
+	reset();	
+};
+
+function confSave(){
+	// 保存配置
+	//hidSwith();
+	document.getElementById("tagForm").onsubmit = function(e){
+		e.preventDefault();
+		console.log(e);
+		var f = e.target,
+			formData = new FormData(f),
+			para = document.getElementById('row-right'),
+			xhr = new XMLHttpRequest();
+		console.log(formData);
+		console.log(f);
+		xhr.open("POST", f.action, true);
+		xhr.onreadystatechange=function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				var rowNew = xhr.responseText;
+				if(rowNew.length>0){
+					para.innerHTML = rowNew;
+					hidSwith();
+				}else{
+					alert('群名重复，结果未保存。');
+					reset();
+				};
+			};
+		};
+		xhr.send(formData);
+	};
+};
+
+function confCancel(){
+	// 取消更改
+	hidSwith();
+	var formRule = document.getElementById('formRule');
+	formRule.innerHTML = '\
+		{% for room in rooms %}\
+		<tr>\
+			<td class="input-lg">\
+			{% if is_strict == "True" %}\
+				{{ room|cut:"#" }}\
+			{% else %}\
+				{{ room }}\
+			{% endif %}\
+			</td>\
+			<td class="input-lg">\
+			{% for rule in room.rules.all %}\
+				{{ rule.keyword }}\
+			{% endfor %}\
+			</td>\
+			<td class="input-lg text-center">\
+			{% if is_strict == "True" %}\
+				{{ room.order|add:-100 }}\
+			{% else %}\
+				{{ room.order }}\
+			{% endif %}\
+			</td>\
+		</tr>\
+		{% endfor %}'
+};
+
+function ruleMore(){
+	// 新增规则
+	var formRule = document.getElementById('formRule'),
+		tr = document.createElement('tr');
+	formRule.appendChild(tr);
+	tr.innerHTML = '\
+		<td class="input-lg">\
+			<fieldset>\
+				<input class="form-control input-lg" name="rooms" type="text" placeholder="群名" list="roomOption" onfocus="this.select();">\
+				<datalist id="roomOption">\
+				{% for roomOpt in rooms %}\
+					<option value="{{ roomOpt }}">\
+				{% endfor %}\
+				</datalist>\
+			</fieldset>\
+		</td>\
+		<td class="input-lg">\
+			<input class="form-control input-lg" name="keywords" type="text" placeholder="关键字集" onfocus="this.select();">\
+		</td>\
+		<td class="input-lg text-center">\
+			<input class="form-control input-lg" name="orders" type="text" placeholder="< 100" onfocus="this.select();">\
+		</td>'
+};
+
+function reset(func){
+	// 重置入群规则配置
+	var para = document.getElementById('row-right'),
+		xhr = new XMLHttpRequest();
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState == 4 && xhr.status == 200){
+			var rowNew = xhr.responseText;
+			para.innerHTML = rowNew;
+			if(func){
+				func();
+			};
+		};
+	};
+	xhr.open("GET", '{% url "webot:ajax:modify" %}?strict={{ is_strict }}', true);
+	xhr.send();
+};
+</script>
+{% endblock %}

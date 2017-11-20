@@ -1,0 +1,64 @@
+<td class='unhid hidSwith'>
+	<a href='{% url "crm:detail" %}?uid={{ lab_user.id }}'>{{ lab_user }}</a>
+</td>
+<td class='info hidden hidSwith'>
+	<a href='#zz' class='username' style='color:red' onclick='inputThis(this)'>{{ lab_user }}</a>
+</td>
+{% if not data_key %}
+	{% if lab_user.nickname %}
+	<td class='unhid hidSwith'>
+		<a href='{% url "crm:class" %}?uid={{ lab_user.id }}' target='_blank'>{{ lab_user.nickname }}</a>
+	</td>
+	<td class='info hidden hidSwith'>
+		<a href='#zz' class='nickname' style='color:red' onclick='inputThis(this)'>{{ lab_user.nickname }}</a>
+	</td>
+	{% else %}
+	<td class='info unhid hidSwith'>
+		<a href='#zz' style='color:red' onclick='newAttrAdd(this, "addUsername")'>添加用户名</a>
+	</td>
+	<td class='info hidden hidSwith'>
+		<a href='#zz' class='nickname' style='color:red' onclick='inputThis(this)'>添加用户名</a>
+	</td>
+	{% endif %}
+{% endif %}
+{% if lab_user.wechat %}
+<td class='unhid hidSwith'>{{ lab_user.wechat }}</td>
+<td class='info hidden hidSwith'>
+	<a href='#zz' class='wechat' style='color:red' onclick='inputThis(this)'>{{ lab_user.wechat }}</a>
+</td>
+{% else %}
+<td class='info unhid hidSwith'>
+	<a href='#zz' style='color:red' onclick='newAttrAdd(this, "addWechat")'>添加微信号</a>
+</td>
+<td class='info hidden hidSwith'>
+	<a href='#zz' class='wechat' style='color:red' onclick='inputThis(this)'>添加微信号</a>
+</td>
+{% endif %}
+<td class='unhid hidSwith'>{{ lab_user.ta }}</td>
+<td class='info hidden hidSwith'>
+	<a href='#zz' class='ta' style='color:red' onclick='inputThis(this)'>{{ lab_user.ta }}</a>
+</td>
+{% if lab_user.papers.last %}
+<td>
+	<a href='{% url "crm:paper" %}?data_key={{ lab_user.papers.last.key }}{{ lab_user.id }}'>{{ lab_user.papers.last }}</a>
+</td>
+{% elif data_key %}
+<td class='info'>
+	<a style='color:red'>添加问卷</a>
+</td>
+{% else %}
+<td class='info'>
+	<a href='{% url "crm:conf" %}' style='color:red'>添加问卷</a>
+</td>
+{% endif %}
+<td>{{ lab_user.user.date_joined|date:"Y-m-d" }}</td>
+<td>{{ lab_user.dialogs.last.log_time|date:"Y-m-d" }}</td>
+{% if data_key %}
+<td>
+	<input type='checkbox' name='userId' value='{{ lab_user.id }}'>
+</td>
+{% else %}
+<td class='hidden tbHid'>
+	<input form='formUserDel' type='checkbox' name='userId' value='{{ lab_user.id }}'>
+</td>
+{% endif %}

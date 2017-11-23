@@ -25,7 +25,7 @@
 	</caption>  
 	<thead class='thead-inverse'>
 		<tr>
-			<th><input  type="checkbox" name="all" onclick="allCheck(this)">群组ID</th>
+			<th><input id='AllUserInGroup' type="checkbox" name="all" onclick="allCheck(this)">群组ID</th>
             <th>群组组名</th>
 			<th>本站名</th>
 			<th>微信</th>
@@ -37,17 +37,17 @@
 		{% for lab_user in users %}
 		<tr id='user{{ lab_user.id }}'>
 			{% if lab_user.group.id == group.id %}
-			<td>
-				<input type="checkbox" name="studentgroup" value="1" onclick="chose(this)">
-				<a href='{% url "group:studentgroup" %}?group={{lab_user.group.id}}'>
+			<td class="unhid hidSwith">
+				<input type="checkbox" form='formgroup' name="studentgroup" value={{lab_user.id}} onclick="chose(this)">
 				{{ lab_user.group.id }}
-				</a>
 			</td>
 			<td>
 				{{ lab_user.group.group_name }}
 			</td>
 			<td class='unhid hidSwith'>
-				<a href='#zz' class='username' style='color:blue'>{{ lab_user }}</a>
+				<a class='username' style='color:blue'>
+				 {{ lab_user }}
+				</a>
 			</td>
 			<td class='unhid hidSwith'>
 				{{ lab_user.wechat }}
@@ -64,15 +64,16 @@
 	</tbody>
 </table>
 {% block changegroup %}
-<form action="" method="get"> 
+<form id='formgroup' action="" method="post">
+	{% csrf_token %} 
 	<label>移动到：</label> 
-	<select name="selectgroup"  class="visible-lg-inline visible-sm-inline visible-md-inline" >
+	<select id='selectgroupvalue' name="selectgroup"  class="visible-lg-inline visible-sm-inline visible-md-inline" >
 			<option value=0 selected>=== 已有群组 ===</option> 
 			{% for group in groups %}
 				<option value={{group.id}}>{{ group.group_name }}</option>		
 			{% endfor %}  
 	</select>
-	<input type="button" id="btnChangeGroup" value="提交" onclick="ChangeUserGroup(this)"/> 
+	<input type="submit" id="btnChangeGroup" value="提交"/> 
 </form> 
 {% endblock %}
 {% endblock %}
@@ -172,7 +173,26 @@ function AddGroupName(){
 
 function ChangeUserGroup(){
 	console.log('Enter the ChangeUserGroup');
-	
+    // iGroupFlag = $("#AllUserInGroup").is(":checked");
+	// if(iGroupFlag === true){
+    // 	unCheckedBoxs = $("input[type=checkbox]").not("input:checked").length;
+	// 	CheckedBoxs =  $('input[type=checkbox]:checked').length - 1;
+	// }
+	// else if(iGroupFlag === false){
+	//    //未勾选个数
+    // 	unCheckedBoxs = $("input[type=checkbox]").not("input:checked").length - 1;
+	//     // 勾选个数
+	// 	CheckedBoxs = $('input[type=checkbox]:checked').length;
+	// }
+	// 新的群组ID
+	NewGroupId = $('select option:selected').val();
+    OneGroupBox = $('input[type=checkbox]').length - 1;
+	for(var i=0;i<OneGroupBox;i++){
+		OldGroupId = $('input[name=studentgroup]')[i].value;
+		if(NewGroupId != OldGroupId)
+		   OldGroupId = NewGroupId;
+	};
+    console.log('Exited the ChangeUserGroup');
 };
 </script>
 {% endblock %}

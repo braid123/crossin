@@ -1,5 +1,6 @@
 <td>
-	<input type="checkbox" name="studentgroup" value="1" onclick="chose(this)">{{ lab_user.group.id }}
+	<input type="checkbox" form='formgroup' name="studentgroup" value={{lab_user.id}} onclick="chose(this)">		
+	{{ lab_user.group.id }}
 </td>
 <td>
 	{{ lab_user.group.group_name }}

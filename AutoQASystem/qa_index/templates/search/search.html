@@ -8,11 +8,13 @@
         }
     </style>
 
-    <form method="get" action=".">
-        <form role="search" method="get" id="searchform" action="{% url 'haystack_search' %}">
-            <input type="search" name="q" placeholder="搜索" required>
-            <button type="submit"><span class="ion-ios-search-strong"></span></button>
-          </form>
+    <form role="search" method="get" id="searchform" action="{% url 'haystack_search' %}">
+        <input type="search" name="q" placeholder="输入想要查询的问题" required>
+        <button type="submit">
+            <span class="ion-ios-search-strong">
+                查询
+            </span>
+        </button>        
         
           {% if query %}
             <h3>Results</h3>

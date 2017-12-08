@@ -16,10 +16,13 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from qa_index import urls as qa_urls
+from qa_index import views as qa_views
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     # url(r'^search/', include('haystack.urls')),
-    url(r'^qa/', include(qa_urls)),
+    url(r'^answers/', include(qa_urls)),
+    url(r'^questions/(\d+)/$', qa_views.questions, name='questions'),
+    url(r'^feedback',  qa_views.feedback, name='feedback')
 ]

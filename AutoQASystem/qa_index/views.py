@@ -1,11 +1,12 @@
 ﻿from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import *
+from .forms import *
 # Create your views here.
 
 
@@ -91,3 +92,22 @@ def key_to_item(request):
         return HttpResponse(json.dumps({'error': str(e)}))
     else:
         return HttpResponse(json.dumps({'kid': keyword.id, 'new_key': is_new_key}))
+
+
+def questions(request, qid):
+    if request.method == 'GET':
+        question_id = qid
+        qa = get_object_or_404(QAItem, id=qid)
+        return HttpResponse(qa.title+qa.desc+qa.answer)
+    elif request.method == 'POST':
+        print('qid>>>' + qid)
+        question_title = request.POST.get('title')
+        question_desc = request.POST.get('description')
+        print(question_title)
+        print(question_desc)
+        if question_desc and question_title:
+             NewQAItem, is_new = QAItem.objects.get_or_create(title=question_title, desc=question_desc)
+        return HttpResponseRedirect('/feedback.html')
+
+def feedback(request):
+    return render(request, 'feedback.html')

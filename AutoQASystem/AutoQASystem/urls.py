@@ -22,7 +22,6 @@ from qa_index import views as qa_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     # url(r'^search/', include('haystack.urls')),
-    url(r'^answers/', include(qa_urls)),
-    url(r'^questions/(\d+)/$', qa_views.questions, name='questions'),
+    url(r'^faq/', include(qa_urls)),
     url(r'^feedback',  qa_views.feedback, name='feedback')
 ]

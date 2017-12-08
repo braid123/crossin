@@ -98,16 +98,27 @@ def questions(request, qid):
     if request.method == 'GET':
         question_id = qid
         qa = get_object_or_404(QAItem, id=qid)
-        return HttpResponse(qa.title+qa.desc+qa.answer)
+        return render(request, 'question.html', {'qid': question_id,
+                                                 'title': qa.title,
+                                                 'description': qa.desc,
+                                                 'answer': qa.answer})
     elif request.method == 'POST':
-        print('qid>>>' + qid)
+        comments = request.GET.get('comments')
+        question_id = qid
+        print(comments, question_id)
+        return HttpResponse(1111111111111)
+
+
+def ask(request):
+    if request.method == 'GET':
+        return render(request, 'ask.html')
+    elif request.method == 'POST':
         question_title = request.POST.get('title')
         question_desc = request.POST.get('description')
-        print(question_title)
-        print(question_desc)
         if question_desc and question_title:
              NewQAItem, is_new = QAItem.objects.get_or_create(title=question_title, desc=question_desc)
         return HttpResponseRedirect('/feedback.html')
+
 
 def feedback(request):
     return render(request, 'feedback.html')

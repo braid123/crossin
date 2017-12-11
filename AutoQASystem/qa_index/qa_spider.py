@@ -7,7 +7,7 @@ import threading
 root_url = 'http://crossincode.com'
 cookies = {
     # 间隔更新cookie,代优化
-    'Cookie': 'UM_distinctid=15fed6e0c25bf-0d92fdaae2f5b2-7b113d-100200-15fed6e0c2646a;'
+    'Cookie': 'UM_distinctid=15fed6e0c25bf-0d92fdaae2f5b2-7b113d-100200-15fed6e0c2646a; '
               'sessionid=vivze4x49mnb16br8plvdo32ciaw2tip; '
               'csrftoken=51uTgkCNv1U6PekLiRp1xcnUpu80sbEy'
 }
@@ -34,7 +34,7 @@ def _save_item(title, desc, answer):
     """
     保存条目
     """
-    url = 'http://127.0.0.1:8000/qa/save'
+    url = 'http://127.0.0.1:8000/faq/save'
     data = {
         'title': title,
         'desc': desc,
@@ -50,7 +50,7 @@ def _save_keyword(key, qid):
     """
     保存关键字
     """
-    url = 'http://127.0.0.1:8000/qa/k2qa'
+    url = 'http://127.0.0.1:8000/faq/k2qa'
     data = {
         'key': key,
         'qid': qid

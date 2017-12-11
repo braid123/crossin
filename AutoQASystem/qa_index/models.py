@@ -33,7 +33,7 @@ class KeyToQA(models.Model):
 
 class Comment(models.Model):
     qaitem = models.ForeignKey(to=QAItem, related_name="comments")
-    description = models.TextField(default="")
+    content = models.TextField(default="")
 
     def __str__(self):
-        return self.description
+        return self.content

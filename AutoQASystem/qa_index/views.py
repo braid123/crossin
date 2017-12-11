@@ -101,13 +101,21 @@ def questions(request, qid):
         return render(request, 'question.html', {'qid': question_id,
                                                  'title': qa.title,
                                                  'description': qa.desc,
-                                                 'answer': qa.answer})
+                                                 'answer': qa.answer,
+                                                 'comment': qa.comments.all()})
     elif request.method == 'POST':
-        comments = request.GET.get('comments')
         question_id = qid
-        print(comments, question_id)
-        return HttpResponse(1111111111111)
-
+        form = CommentForm(data=request.POST)
+        qa = get_object_or_404(QAItem, id=qid)
+        answer = QAItem.objects.filter(id=question_id)
+        comment = request.POST.get('comment')
+        print(comment, question_id)
+        if form.is_valid() and answer.exists():
+            content = form.cleaned_data['comment']
+            NewComment = Comment.objects.create(qaitem=qa, content=comment)
+            return HttpResponseRedirect('.')
+        else:
+            return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def ask(request):
     if request.method == 'GET':
@@ -117,7 +125,7 @@ def ask(request):
         question_desc = request.POST.get('description')
         if question_desc and question_title:
              NewQAItem, is_new = QAItem.objects.get_or_create(title=question_title, desc=question_desc)
-        return HttpResponseRedirect('/feedback.html')
+        return HttpResponse('/feedback.html')
 
 
 def feedback(request):

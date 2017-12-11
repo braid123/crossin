@@ -15,11 +15,11 @@ class QAItemAdmin(ImportExportModelAdmin):
 
 
 class CommentAdmin(ImportExportModelAdmin):
-    list_display = ('qaitem', 'description')
-    search_fields = ('qaitem', 'description')
+    list_display = ('qaitem', 'content')
+    search_fields = ('qaitem', 'content')
     fieldsets = (
         ['Main', {
-            'fields': ('qaitem', 'description')
+            'fields': ('qaitem', 'content')
         }],
     )
 

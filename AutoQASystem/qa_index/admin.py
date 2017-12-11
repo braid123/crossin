@@ -13,9 +13,6 @@ class QAItemAdmin(ImportExportModelAdmin):
         }],
     )
 
-    def __str__(self):
-        return self.title
-
 
 class CommentAdmin(ImportExportModelAdmin):
     list_display = ('qaitem', 'description')
@@ -25,9 +22,6 @@ class CommentAdmin(ImportExportModelAdmin):
             'fields': ('qaitem', 'description')
         }],
     )
-
-    def __str__(self):
-        return self.title
 
 
 admin.site.register(QAItem, QAItemAdmin)

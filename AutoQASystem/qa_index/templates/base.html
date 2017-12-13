@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	{% load static %}
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel='stylesheet' type='text/css' href="{% static 'bootstrap\css\bootstrap.min.css' %}" />
+	<link rel='stylesheet' type='text/css' href="{% static 'bootstrap\css\bootstrap-theme.min.css' %}" />
+	{% block link %}<link />{% endblock %}
+    <title>{% block title %}标题{% endblock %}</title>
+</head>
+<body class='container-fluid'>
+<footer class='row'>
+	{% block footer %}
+		<p class='text-center'><b><a>***感谢访问***</a></b></p>
+	{% endblock %}
+</footer>
+
+{% block modal %}{% endblock %}
+<script src="{% static 'bootstrap\js\bootstrap.min.js' %}"></script>
+<script src="{% static 'bootstrap\js\bootstrap.js' %}"></script>
+<script src="{% static 'bootstrap\js\npm.js' %}"></script>
+</body>
+</html>

@@ -125,7 +125,7 @@ def ask(request):
         question_desc = request.POST.get('description')
         if question_desc and question_title:
              NewQAItem, is_new = QAItem.objects.get_or_create(title=question_title, desc=question_desc)
-        return HttpResponse('/feedback.html')
+        return HttpResponseRedirect('/feedback.html')
 
 
 def feedback(request):

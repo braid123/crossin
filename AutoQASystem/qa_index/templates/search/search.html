@@ -1,48 +1,63 @@
+<!-- {% include 'base.html' %} -->
 {% load highlight %}
 {% block content %}
-    <h2>查询问题</h2>
-
-    <style>
-        span.highlighted {
-            color: red;
-        }
-    </style>
-
-    <form role="search" method="get" id="searchform" action="{% url 'haystack_search' %}">
-        {% csrf_token %}
-        <input type="search" name="q" placeholder="输入想要查询的问题">
-        <button type="submit">
-            <span class="ion-ios-search-strong">
-                查询
-            </span>
-        </button>        
-        
-          {% if query %}
-            <h3>Results</h3>
-
-            {% for result in page.object_list %}
-                <p>
-                    <a href="/faq/questions/{{ result.object.id }}/">{% highlight result.object.title with query %}</a>
-					{% highlight result.object.answer with query max_length 40 css_class "highlighted" %}
-                </p>
-            {% empty %}
-                <p>没有搜索到合适的问题及答案,请告诉我们</p>
-            {% endfor %}
-
-            {% if page.has_previous or page.has_next %}
-                <div>
-                    {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; 上一页{% if page.has_previous %}</a>{% endif %}
-                    |
-                    {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}下一页 &raquo;{% if page.has_next %}</a>{% endif %}
-                </div>
-            {% endif %}
-        {% else %}
-            请输入搜索关键词，例如 django
-        {% endif %}
-    </form>
-    <button onClick="jumptoaskquestion()" type="button" class="btn btn-primary " id="askquestion" data-type="qa">
-        提问题
-    </button>
+{% load static %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="//res.crossincode.com/js/jquery-1.11.1.min.js"></script>
+<script src="//res.crossincode.com/js/bootstrap.min.js"></script>
+<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.min.css' %}" media="screen" />
+<link rel='stylesheet' type='text/css' href="{% static 'css\my-style.css' %}"/>
+<!-- <link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap-theme.min.css' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap-theme.css.map' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap-theme.min.css.map' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.css' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.css.map' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.min.css.map' %}" /> -->
+<div class="container content">
+    <div class="container-narrow">
+        <div class="text" style="text-align:center;">             
+            <h3>查询问题</h3>
+        </div>
+        <div class="row" style="padding:0 15px">
+            <div class="col-lg-6 mysearch">
+                <form role="search" method="get" id="searchform" action="{% url 'haystack_search' %}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <!-- <input type="search" style="margin-left:350px;width:540px;height:36px;text-align:left;" class="form-control" name="q" placeholder="输入想要查询的问题"> -->
+                        <input type="search" id="question" name="q" class="form-control" placeholder="输入想要查询的问题">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-primary active">点击查询</button>
+                    </span>
+                        {% if query %}
+                        <h2>查询结果</h2>
+                        {% for result in page.object_list %}
+                        <span>
+                            <a href="/faq/questions/{{ result.object.id }}/">{% highlight result.object.title with query %}</a>
+                            {% highlight result.object.answer with query max_length 40 css_class "highlighted" %}
+                        </span>
+                        {% empty %}
+                        <span>没有搜索到合适的问题及答案,请告诉我们</span>
+                        {% endfor %}
+                        {% if page.has_previous or page.has_next %}
+                        <div>
+                            {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; 上一页{% if page.has_previous %}</a>{% endif %}
+                            |
+                            {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}下一页 &raquo;{% if page.has_next %}</a>{% endif %}
+                        </div>
+                        {% endif %}                      
+                    {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <hr />
+        <div style="text-align:center">
+            <button  onClick="jumptoaskquestion()" type="button" class="btn btn-lg" id="askquestion" data-type="qa">
+                    提问题
+            </button>            
+        </div>
+    </div>
+</div>
 {% endblock %}
 <script type=text/javascript>
     function jumptoaskquestion(){

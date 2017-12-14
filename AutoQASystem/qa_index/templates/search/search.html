@@ -5,14 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="//res.crossincode.com/js/jquery-1.11.1.min.js"></script>
 <script src="//res.crossincode.com/js/bootstrap.min.js"></script>
+<style type="text/css">
+    /* Custom container */
+    .container-narrow {
+      margin: 0 auto;
+      max-width: 700px;
+    }
+  </style>
 <link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.min.css' %}" media="screen" />
 <link rel='stylesheet' type='text/css' href="{% static 'css\my-style.css' %}"/>
-<!-- <link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap-theme.min.css' %}" />
-<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap-theme.css.map' %}" />
-<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap-theme.min.css.map' %}" />
-<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.css' %}" />
-<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.css.map' %}" />
-<link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.min.css.map' %}" /> -->
 <div class="container content">
     <div class="container-narrow">
         <div class="text" style="text-align:center;">             
@@ -23,32 +24,35 @@
                 <form role="search" method="get" id="searchform" action="{% url 'haystack_search' %}">
                     {% csrf_token %}
                     <div class="input-group">
-                        <!-- <input type="search" style="margin-left:350px;width:540px;height:36px;text-align:left;" class="form-control" name="q" placeholder="输入想要查询的问题"> -->
                         <input type="search" id="question" name="q" class="form-control" placeholder="输入想要查询的问题">
                     <span class="input-group-btn">
                         <button type="submit" class="btn btn-primary active">点击查询</button>
                     </span>
-                        {% if query %}
-                        <h2>查询结果</h2>
-                        {% for result in page.object_list %}
-                        <span>
-                            <a href="/faq/questions/{{ result.object.id }}/">{% highlight result.object.title with query %}</a>
-                            {% highlight result.object.answer with query max_length 40 css_class "highlighted" %}
-                        </span>
-                        {% empty %}
-                        <span>没有搜索到合适的问题及答案,请告诉我们</span>
-                        {% endfor %}
-                        {% if page.has_previous or page.has_next %}
-                        <div>
-                            {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; 上一页{% if page.has_previous %}</a>{% endif %}
-                            |
-                            {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}下一页 &raquo;{% if page.has_next %}</a>{% endif %}
-                        </div>
-                        {% endif %}                      
-                    {% endif %}
                     </div>
                 </form>
             </div>
+        </div>
+        <div class="list-group">
+            {% if query %}
+            <div class="text" style="text-align:center;">             
+                <h3>查询结果</h3>
+            </div>
+            {% for result in page.object_list %}
+            <div class="list-group-item" style="display:table;table-layout:fixed;max-width:700px;width:100%">
+                <a href="/faq/questions/{{ result.object.id }}/">{% highlight result.object.title with query %}</a>
+                {% highlight result.object.answer with query max_length 40 css_class "highlighted" %}
+            </div>
+            {% empty %}
+            <div class="list-group-item">没有搜索到合适的问题及答案,请告诉我们</div>
+            {% endfor %}
+            {% if page.has_previous or page.has_next %}
+            <div>
+                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; 上一页{% if page.has_previous %}</a>{% endif %}
+                |
+                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}下一页 &raquo;{% if page.has_next %}</a>{% endif %}
+            </div>
+            {% endif %}                      
+        {% endif %}
         </div>
         <hr />
         <div style="text-align:center">

@@ -14,13 +14,14 @@
   </style>
 <link rel='stylesheet' type='text/css' href="{% static 'css\bootstrap.min.css' %}" media="screen" />
 <link rel='stylesheet' type='text/css' href="{% static 'css\my-style.css' %}"/>
+<title>Search</title>
 <div class="container content">
     <div class="container-narrow">
         <div class="text" style="text-align:center;">             
             <h3>查询问题</h3>
         </div>
         <div class="row" style="padding:0 15px">
-            <div class="col-lg-6 mysearch">
+            <div class="search" style="width: 100%;">
                 <form role="search" method="get" id="searchform" action="{% url 'haystack_search' %}">
                     {% csrf_token %}
                     <div class="input-group">

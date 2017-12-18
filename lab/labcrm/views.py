@@ -166,17 +166,29 @@ def _user_list_get(request):
         return render(request, 'labcrm/ajax/user_del.html', {
             'users': users
         })
+    elif request.GET.get('class') and request.GET.get('userid'):
+        print('@修改学员类别')
+        newclass = request.GET.get('class')
+        user_id = request.GET.get('userid')
+        try:
+            print(user_id)
+            print(newclass)
+            LabUser.objects.filter(id=user_id).update(classification=newclass)
+        except IntegrityError:
+            return HttpResponse(1)
+        return HttpResponse('.')
     print('@用户列表展示')
     users = LabUser.objects.filter(is_del=False).order_by('-user__date_joined')
+    classification = LabUser.CLASS_CHOICES
     return render(request, 'labcrm/user_list.html', {
-        'users': users
+        'users': users,
+        'classification': classification,
     })
 
 
 @log_this
 @login_required
 def user_list(request):
-    print('request\t', request)
     if request.method == 'POST':
         return _user_list_post(request)
     else:
@@ -781,7 +793,8 @@ def subject_statistic(request):
         course_id = 0
     course = dict(LearnedCourse.COURSE_CHOICES)[course_id]
     course_data = sorted(course_data_generator(course_id), key=lambda x: (x.end, x.mid, x.max, x.amounts), reverse=True)
-
+    print('course>>>', course)
+    print('course_data>>>', course_data)
     # studentgroup = StudentGroup.objects.all()
     return render(request, 'labcrm/course_statistic.html', {
         'course': course,

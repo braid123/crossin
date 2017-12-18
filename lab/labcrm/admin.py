@@ -69,11 +69,11 @@ class LabUsersResource(resources.ModelResource):
 class LabUserAdmin(ImportExportModelAdmin):
     resource_class = LabUsersResource
     inlines = [InfoQInline, InfoAInline, PaperInline, DialogInline]
-    list_display = ('user', 'nickname', 'wechat', 'group')
-    search_fields = ('user', 'nickname', 'wechat', 'group')
+    list_display = ('user', 'nickname', 'wechat', 'group', 'classification')
+    search_fields = ('user', 'nickname', 'wechat', 'group', 'classification')
     fieldsets = (
         ['Main', {
-            'fields': ('user', 'nickname', 'wechat', 'group')
+            'fields': ('user', 'nickname', 'wechat', 'group', 'classification')
         }],
     )
 

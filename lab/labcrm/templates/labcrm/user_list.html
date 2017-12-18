@@ -27,6 +27,7 @@
 			<th>问卷</th>
 			<th>入学日期</th>
 			<th>沟通记录</th>
+			<th>学员类别</th>
 			<th class='hidden tbHid'>删除</th>
 		</tr>
 	</thead>
@@ -80,5 +81,19 @@
 </div>
 {% endblock %}
 {% block script %}
+<script>
+	$(selectclassificationvalue).change(function(e){
+		e.preventDefault();
+		var target_url = '/crm/users'
+			new_user_classification = 0 
+			uid=this.parentElement.parentElement.id.replace('user', '');;
+		new_user_classification = $(this).val()
+		console.log(uid)
+		console.log(new_user_classification)
+		xhr=new XMLHttpRequest();
+		xhr.open("GET",target_url+'?class='+new_user_classification+"&userid="+uid,true);
+		xhr.send(new_user_classification+uid);
+	});
+</script>
 <script type="text/javascript" src="/static/bootstrap3/js/myScriptForUserList.js"></script> 
 {% endblock %}

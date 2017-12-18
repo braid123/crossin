@@ -19,6 +19,12 @@ class LabUser(models.Model):
     # json 格式可扩充字段，{course_id: status}
     # status ={1: 期中, 2: 期末, 3: 期中+期末}
     statistic = models.TextField(verbose_name='完课统计', default='{}')
+    CLASS_CHOICES = (
+        (0, '无'),
+        (1, '基础班'),
+        (2, '实战班'),
+    )
+    classification = models.IntegerField(verbose_name='学员类别', default=0, choices=CLASS_CHOICES)
     group = models.ForeignKey(to=StudentGroup, related_name="groupusers", blank=True, null=True)
 
     def __str__(self):

@@ -15,6 +15,9 @@ def getWeekOfFirstDay(year):
 
 def getBlackFriday(year):
     # 遍历12个月
+    if year < 2017:
+        print('输入年份应大于或等于2017')
+        return
     days = [[31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]]
     week = getWeekOfFirstDay(year)
     flag = 0
@@ -25,11 +28,11 @@ def getBlackFriday(year):
         # 判断每个月13号是否是黑色星期五
         if (day + 12 + week) % 7 == 4:
             if i != 11:
-                print("符合日期：%d-%d-13" % (year, i+1))
+                print("%d-%d-13" % (year, i+1))
             elif i == 11:
-                print("符合日期：%d-12-13" % (year))
+                print("%d-12-13" % (year))
         day += days[flag][i]
 
-search_year = 2046
-print('查询年份：',search_year)
+search_year = int(input('查询年份：'))
+print('符合日期:')
 getBlackFriday(search_year)

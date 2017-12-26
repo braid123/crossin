@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^ajax/', include(ajax_urls, namespace='ajax')),
     url(r'^modify/', include(modify_urls, namespace='modify')),
     url(r'^users', views.user_list, name='list'),
+    url(r'^userclass', views.user_class, name='userclass'),
     url(r'^detail/(?P<new_id>.*)$', views.user_detail, name='detail2'),
     url(r'^detail', views.user_detail, name='detail'),
     url(r'^papers', views.papers_create, name='papers'),

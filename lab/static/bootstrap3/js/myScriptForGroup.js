@@ -1,5 +1,5 @@
 function allCheck(node1){
-	var node=document.getElementsByName("studentgroup");
+	var node=document.getElementsByName("studentclass");
 	for (var x = 0; x < node.length; x++) {
 		node[x].checked=node1.checked;
 	}
@@ -10,7 +10,7 @@ function allCheck(node1){
 function chose(node){
 	var flag=true;//用于遍历是否是全部变量设置
 	var allM=document.getElementsByName("all")[0];
-	var node=document.getElementsByName("studentgroup");
+	var node=document.getElementsByName("studentclass");
 	for (var x = 0; x < node.length; x++) {
 		if(node[x].checked==false){//只要有一个没选中，就退出遍历，标记设置为false
 			flag=false;
@@ -23,7 +23,7 @@ function chose(node){
 		allM.checked=false;
 	}
 };
-
+/*
 function ResetGroupName(){
 	$("#addGroupname").val("");
 	$("#addGroupNote").val("");
@@ -95,24 +95,25 @@ function DelGroupId(){
 
 function ChangeUserGroup(){
 	console.log('Enter the ChangeUserGroup');
-    // iGroupFlag = $("#AllUserInGroup").is(":checked");
-	// if(iGroupFlag === true){
-    // 	unCheckedBoxs = $("input[type=checkbox]").not("input:checked").length;
-	// 	CheckedBoxs =  $('input[type=checkbox]:checked').length - 1;
-	// }
-	// else if(iGroupFlag === false){
-	//    //未勾选个数
-    // 	unCheckedBoxs = $("input[type=checkbox]").not("input:checked").length - 1;
-	//     // 勾选个数
-	// 	CheckedBoxs = $('input[type=checkbox]:checked').length;
-	// }
-	// 新的群组ID
-	// NewGroupId = $('select option:selected').val();
-    // OneGroupBox = $('input[type=checkbox]').length - 1;
-	// for(var i=0;i<OneGroupBox;i++){
-	// 	OldGroupId = $('input[name=studentgroup]')[i].value;
-	// 	if(NewGroupId != OldGroupId)
-	// 	   OldGroupId = NewGroupId;
-	// };
+    iGroupFlag = $("#AllUserInGroup").is(":checked");
+	if(iGroupFlag === true){
+    	unCheckedBoxs = $("input[type=checkbox]").not("input:checked").length;
+		CheckedBoxs =  $('input[type=checkbox]:checked').length - 1;
+	}
+	else if(iGroupFlag === false){
+	   //未勾选个数
+    	unCheckedBoxs = $("input[type=checkbox]").not("input:checked").length - 1;
+	    // 勾选个数
+		CheckedBoxs = $('input[type=checkbox]:checked').length;
+	}
+	新的群组ID
+	NewGroupId = $('select option:selected').val();
+    OneGroupBox = $('input[type=checkbox]').length - 1;
+	for(var i=0;i<OneGroupBox;i++){
+		OldGroupId = $('input[name=studentgroup]')[i].value;
+		if(NewGroupId != OldGroupId)
+		   OldGroupId = NewGroupId;
+	};
     console.log('Exited the ChangeUserGroup');
 };
+*/

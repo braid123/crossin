@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import *
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django import forms
@@ -963,4 +963,36 @@ def ajax_user_del(request):
 #     return HttpResponse(data)
 
 
-
+@log_this
+@login_required
+def user_class(request):
+    if request.method == 'POST':
+        new_class = request.POST.get('selectclass')
+        users_id = request.POST.getlist('studentclass')
+        users = LabUser.objects.filter(id__in=users_id)
+        for user in users:
+            user.classification = new_class
+            user.save()
+        labusers = LabUser.objects.filter(is_del=False).order_by('-user__date_joined')
+        classification = LabUser.CLASS_CHOICES
+        return render(request, 'labcrm/user_class.html', {
+                'labusers': labusers,
+                'classification': classification,
+            })
+    elif request.method == 'GET':
+        if not request.GET.get('class'):
+            labusers = LabUser.objects.filter(is_del=False).order_by('-user__date_joined')
+            classification = LabUser.CLASS_CHOICES
+            return render(request, 'labcrm/user_class.html', {
+                'labusers': labusers,
+                'classification': classification,
+            })
+        else:
+            classification = LabUser.CLASS_CHOICES
+            userclass = request.GET.get('class')
+            labusers = LabUser.objects.filter(is_del=False).filter(classification=userclass).order_by('-user__date_joined')
+            return render(request, 'labcrm/user_class.html', {
+                'labusers': labusers,
+                'classification': classification,
+                'userclass': userclass,
+            })

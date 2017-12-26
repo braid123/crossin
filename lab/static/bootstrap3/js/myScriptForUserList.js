@@ -39,7 +39,18 @@ function hidSwith(){
 		tags[i].setAttribute("class", classVal);
 	};
 };
-
+function showuserclass(){
+    var    show = document.getElementsByTagName("option");
+	for(var i = 0; i < show.length; i++)
+	{
+		newshow = document.createElement('select');
+		newshow.setAttribute("class","visible-lg-inline visible-sm-inline visible-md-inline");
+		newshow.setAttribute("name","selectclassification");
+		newshow.setAttribute("id","selectclassificationvalue");
+		newshow.appendChild(show[i]);
+		show[i] = newshow;
+	}	
+};
 function rename(){
 	// 重命名
 	var btnModOver = document.getElementById('btnModOver'),
@@ -55,6 +66,7 @@ function rename(){
 	btnUserAdd.setAttribute('disabled', true);
 	btnUserDel.setAttribute('disabled', true);
 	hidSwith();
+	// showuserclass();
 };
 
 function renameOver(){

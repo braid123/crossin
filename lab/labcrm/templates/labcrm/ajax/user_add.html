@@ -59,14 +59,15 @@
 </td>
 {% else %}
 <td>
-	<select id='selectclassificationvalue' name="selectclassification"  class="visible-lg-inline visible-sm-inline visible-md-inline" >
+	<option value={{lab_user.classification}} selected>{{lab_user.get_classification_display}}</option>
+	<!-- <select id='selectclassificationvalue' name="selectclassification"  class="visible-lg-inline visible-sm-inline visible-md-inline" >
 		<option value={{lab_user.classification}} selected>{{lab_user.get_classification_display}}</option>		
 		{% for class in classification %}
 			{% if lab_user.classification != class.0 %}
 				<option value={{class.0}}>{{ class.1 }}</option>
 			{% endif %}		
 	    {% endfor %}  
-	</select>
+	</select> -->
 </td>
 <td class='hidden tbHid'>
 	<input form='formUserDel' type='checkbox' name='userId' value='{{ lab_user.id }}'>

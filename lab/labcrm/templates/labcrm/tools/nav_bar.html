@@ -2,7 +2,7 @@
 	<!--li class='{% block userList %}{% endblock %}'><a href='{% url "crm:list" %}'>用户列表</a></li-->
 	<li class='{{ tag_list|default:"" }}'><a href='{% url "crm:list" %}'>用户列表</a></li>
 	<li class='visible-lg-inline visible-sm-inline visible-md-inline'><a>|</a></li>
-	<li class='{{ tag_group|default:"" }}'><a href='{% url "group:studentgroup" %}'>群组管理</a></li>
+	<li class='{{ tag_group|default:"" }}'><a href='{% url "crm:userclass" %}'>学员分类</a></li>
 	<li class='visible-lg-inline visible-sm-inline visible-md-inline'><a>|</a></li>
 	<li class='{{ tag_conf|default:"" }}'><a href='{% url "crm:conf" %}'>问卷设计</a></li>
 	<li class='visible-lg-inline visible-sm-inline visible-md -inline'><a>|</a></li>

@@ -25,7 +25,7 @@ openpyxl==2.4.9
 pickleshare==0.7.4
 Pillow==4.2.0
 prompt-toolkit==1.0.14
-Pygments==2.2.0
+Pygments==2.7.4
 pymongo==3.4.0
 PyMySQL==0.7.11
 pytz==2017.2

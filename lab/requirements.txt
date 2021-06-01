@@ -39,7 +39,7 @@ testools==0.0.1
 traitlets==4.3.2
 tweepy==3.5.0
 unicodecsv==0.14.1
-urllib3==1.21.1
+urllib3==1.26.5
 wcwidth==0.1.7
 win-unicode-console==0.5
 xlrd==1.1.0
